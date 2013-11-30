@@ -1,4 +1,4 @@
-sitewhere-examples
-==================
+SiteWhere Example Applications
+==============================
 
-Example web applications that demonstrate SiteWhere functionality
+Example web applications that demonstrate SiteWhere functionality.
