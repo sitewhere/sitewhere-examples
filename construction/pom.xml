@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+	<properties>
+		<sitewhere.version>0.9.2</sitewhere.version>
+	</properties>
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>sitewhere</groupId>
+	<artifactId>sitewhere</artifactId>
+	<version>${sitewhere.version}</version>
+	<packaging>war</packaging>
+	<name>SiteWhere Construction Example</name>
+	<url>http://www.reveal-tech.com</url>
+	<dependencies>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<warName>construction</warName>
+					<outputDirectory>${project.basedir}/deploy</outputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>all</id>
+						<goals>
+							<goal>war</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
