@@ -2,7 +2,7 @@
     position: relative;
     overflow: hidden;
     width: 800px;
-    height: 250px;
+    height: 240px;
     margin-left: auto;
     margin-right: auto;
     border: 1px solid #eee;
@@ -19,7 +19,7 @@
 .jcarousel li {
     float: left;
     width: 800px;
-    height: 250px;
+    height: 240px;
     margin-right: 0px;
 }
 

@@ -28,62 +28,64 @@ body {
 }
 .asset-image {
 	position: absolute;
-	width: 180px;
-	height: 180px;
-	left: 20px;
+	width: 200px;
+	height: 200px;
+	left: 15px;
 	top: 20px;
     border: 1px solid #ddd;
     background-color: #fff;
-    -webkit-box-shadow: 0 0 5px #999;
-    -moz-box-shadow: 0 0 5px #999;
-    box-shadow: 0 0 5px #999;
 }
 .asset-banner {
 	position: absolute;
-	width: 182px;
-	left: 20px;
+	width: 200px;
+	left: 15px;
 	top: 20px;
     background-color: #333;
     color: #fff;
-    font-size: 7pt;
+    font-size: 10pt;
     text-align: center;
+}
+.device-image-wrapper {
+	position: absolute;
+	width: 200px;
+	height: 200px;
+	right: 15px;
+	top: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
 }
 .device-image {
 	position: absolute;
-	width: 75px;
-	height: 75px;
-	left: 160px;
-	top: 160px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    -webkit-box-shadow: 0 0 5px #999;
-    -moz-box-shadow: 0 0 5px #999;
-    box-shadow: 0 0 5px #999;
+	width: 160px;
+	height: 160px;
+	right: 35px;
+	top: 50px;
 }
 .device-banner {
 	position: absolute;
-	width: 76px;
-	left: 160px;
-	top: 145px;
+	width: 200px;
+	right: 15px;
+	top: 20px;
     background-color: #333;
     color: #fff;
-    font-size: 7pt;
+    font-size: 10pt;
     text-align: center;
 }
 .assignment-data {
 	position: absolute;
 	width: 350px;
-	left: 250px;
+	left: 225px;
 	top: 20px;
     color: #333;
 }
 .assignment-data h1 {
 	margin: 0px;
     line-height: normal;
-    font-size: 13pt;
+    font-size: 12pt;
 	padding: 3px;
-	background-color: #eee;
+	background-color: #333;
 	border: 1px solid #bbb;
+	color: #fff;
 	text-align: center;
 }
 .assignment-data h2 {
@@ -108,16 +110,17 @@ body {
 }
 .assignment-state {
 	position: absolute;
-	width: 160px;
-	left: 620px;
-	top: 20px;
+	width: 350px;
+	left: 225px;
+	top: 130px;
 }
 .mx-view {
-	position: relative;
+	position: absolute;
+	width: 140px;
 	border: 1px solid #ccc;
 	padding: 15px;
 	font-size: 25pt;
-	height: 71px;
+	height: 60px;
 	text-align: center;
 	background-color: #fff;
 }
@@ -140,7 +143,7 @@ body {
 	width: 100%;
     background-color: #333;
     color: #fff;
-    font-size: 7pt;
+    font-size: 10pt;
     text-align: center;
 }
 .k-content {
@@ -174,8 +177,13 @@ body {
 
 $(document).ready(function() {
 	
+	/** List of assignments */
+	var assignments;
+	
 	// Keep reference to carousel.
-    var jcarousel = $('.jcarousel').jcarousel();
+    var jcarousel = $('.jcarousel').jcarousel({
+        	itemLoadCallback: selectedItemChanged
+    });
 	
 	// Hook up 'previous' control.
     $('.jcarousel-control-prev').on('jcarouselcontrol:active', function() {
@@ -218,7 +226,7 @@ $(document).ready(function() {
 	
 	/** Called when assignments have been loaded */
 	function onAssignmentsLoaded(data, status, jqXHR) {
-		var assignments = data.results;
+		assignments = data.results;
 		var template = kendo.template($("#tpl-assignment").html());
 		var html = "";
 		for (var x = 0; x < assignments.length; x++) {
@@ -239,6 +247,11 @@ $(document).ready(function() {
 	/** Handle error on getting assignment data */
 	function onAssignmentsFailed(jqXHR, textStatus, errorThrown) {
 		handleError(jqXHR, "Unable to load assignment data.");
+	}
+	
+	/** Called when selected item changes */
+	function selectedItemChanged(carousel, state) {
+		alert(carousel.first);
 	}
 });
 </script>
