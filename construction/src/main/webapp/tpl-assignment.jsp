@@ -1,7 +1,6 @@
 <!-- Template for assignment -->
 <script type="text/x-kendo-tmpl" id="tpl-assignment">
-	<li>
-	<input type="hidden" name="token" value="#:token#"/>
+	<li id="#:token#">
 # if (data.status == 'Active') { #
 	<div class="assignment-tile sw-assignment-active">
 		<div class="sw-assignment-active-indicator sw-assignment-status-indicator" style="height: 5px;"></div>

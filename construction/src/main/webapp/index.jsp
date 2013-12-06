@@ -9,6 +9,8 @@
 	<script src="${pageContext.request.contextPath}/scripts/sitewhere.js"></script>
 	<script src="${pageContext.request.contextPath}/scripts/d3.min.js"></script>
 	<script src="${pageContext.request.contextPath}/scripts/rickshaw.min.js"></script>
+	<script src="${pageContext.request.contextPath}/scripts/leaflet.js"></script>
+	<script src="${pageContext.request.contextPath}/scripts/sitewhere-leaflet.js"></script>
 	<link href="${pageContext.request.contextPath}/css/jcarousel.ajax.css" rel="stylesheet" media="screen">
 	<link href="${pageContext.request.contextPath}/css/kendo.common.min.css" rel="stylesheet" />
 	<link href="${pageContext.request.contextPath}/css/kendo.bootstrap.min.css" rel="stylesheet" />
@@ -149,6 +151,14 @@ body {
 .k-content {
 	min-height: 300px;
 }
+.chart-legend {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+.swmap {
+	height: 290px;
+}
 </style>
 
 <%@ include file="../tpl-assignment.jsp"%>
@@ -165,10 +175,19 @@ body {
 		<div id="tabs">
 			<ul>
 				<li class="k-state-active">Measurements</li>
+				<!--  
 				<li>Locations</li>
+				-->
 			</ul>
-			<div>Test1</div>
-			<div>Test2</div>
+			<div style="position: relative;">
+				<div id="chart"></div>
+				<div id="legend" class="chart-legend"></div>
+			</div>
+			<!--  
+			<div>
+				<div id="swmap" class="swmap"></div>
+			</div>
+			-->
 		</div>
 	</div>
 </body>
@@ -177,13 +196,14 @@ body {
 
 $(document).ready(function() {
 	
+	/** Token for site */
+	var siteToken;
+	
 	/** List of assignments */
 	var assignments;
 	
 	// Keep reference to carousel.
-    var jcarousel = $('.jcarousel').jcarousel({
-        	itemLoadCallback: selectedItemChanged
-    });
+    var jcarousel = $('.jcarousel').jcarousel();
 	
 	// Hook up 'previous' control.
     $('.jcarousel-control-prev').on('jcarouselcontrol:active', function() {
@@ -203,6 +223,11 @@ $(document).ready(function() {
         target: '+=1'
     });
 	
+	$('.jcarousel').on('jcarousel:animateend', function(event, carousel) {
+		var token = carousel.first().attr('id');
+		showAssignment(token);
+    });
+	
 	/** Create the tab strip */
 	$("#tabs").kendoTabStrip({
 		animation: false,
@@ -219,6 +244,7 @@ $(document).ready(function() {
 	function onSitesLoaded(data, status, jqXHR) {
 		if (data.results.length > 0) {
 			var site = data.results[0];
+			siteToken = site.token;
 			$.getJSON("/sitewhere/api/sites/" + site.token + "/assignments?includeDevice=true&includeAsset=true", 
 					onAssignmentsLoaded, onAssignmentsFailed);
 		}
@@ -237,6 +263,7 @@ $(document).ready(function() {
 		}
 		$('#assignments').html(html);
 		jcarousel.jcarousel('reload');
+		showAssignment(assignments[0].token);
 	}
 	
 	/** Handle error on getting site data */
@@ -249,9 +276,73 @@ $(document).ready(function() {
 		handleError(jqXHR, "Unable to load assignment data.");
 	}
 	
-	/** Called when selected item changes */
-	function selectedItemChanged(carousel, state) {
-		alert(carousel.first);
+	/** Show assignment for the given token */
+	function showAssignment(token) {
+		$.getJSON("/sitewhere/api/assignments/" + token + "/measurements/series", onSeriesLoaded, onSeriesFailed);
+		//$.getJSON("/sitewhere/api/assignments/" + token + "/locations", onLocationsLoaded, onLocationsFailed);
+	}
+	
+	/** Called after chart series data is loaded */
+	function onSeriesLoaded(swdata, status, jqXHR) {
+		var series = [];
+		for (var x=0; x < swdata.length; x++) {
+			var swseries = swdata[x];
+			var color = (swseries.measurementId == 'fuel.level') ? "red" : "steelblue";
+			var name = (swseries.measurementId == 'fuel.level') ? "Fuel Level" : "Engine Temperature";
+			var data = [];
+			for (var y=0; y < swseries.entries.length; y++) {
+				data.push({"x": swseries.entries[y].measurementDate / 1000, "y": swseries.entries[y].value});
+			}
+			var current = {"color": color, "data": data, "name": name};
+			series.push(current);
+		}
+		createGraph(series);
+	}
+	
+	function createGraph(series) {
+		$('#chart').empty();
+		$('#legend').empty();
+		
+		var graph = new Rickshaw.Graph({
+	        element: document.querySelector("#chart"),
+	        width: 905,
+	        height: 295,
+	        series: series
+		});
+		
+		var axes = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+		axes.render();
+		
+		var legend = new Rickshaw.Graph.Legend({
+	        element: document.querySelector('#legend'),
+	        graph: graph
+		});
+		
+		graph.render();
+	}
+	
+	/** Handle error on getting chart series data */
+	function onSeriesFailed(jqXHR, textStatus, errorThrown) {
+		handleError(jqXHR, "Unable to load chart series data.");
+	}
+	
+	/** Called after location data is loaded */
+	function onLocationsLoaded(data, status, jqXHR) {
+
+		// Create the map.
+		var map = L.Map.siteWhere('swmap', {
+		    siteToken: siteToken,
+		    onZonesLoaded: onZonesLoaded,
+		});
+	}
+	
+	/** Once map is loaded, add assignment data */
+	function onZonesLoaded() {
+	}
+	
+	/** Handle error on getting location data */
+	function onLocationsFailed(jqXHR, textStatus, errorThrown) {
+		handleError(jqXHR, "Unable to load location data.");
 	}
 });
 </script>
