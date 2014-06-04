@@ -10,7 +10,7 @@
 	<artifactId>sitewhere</artifactId>
 	<version>${sitewhere.version}</version>
 	<packaging>war</packaging>
-	<name>SiteWhere Construction Example</name>
+	<name>SiteWhere Sound Monitoring Example</name>
 	<url>http://www.reveal-tech.com</url>
 	<dependencies>
 	</dependencies>
