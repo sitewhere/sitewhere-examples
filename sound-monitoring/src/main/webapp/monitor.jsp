@@ -20,6 +20,14 @@
 body {
 	font-family: "Calibri","Khmer UI";
 }
+svg text {
+    font-family: FontAwesome;
+}
+.highcharts-title {
+	font-size: 14pt;
+	font-weight: bold;
+	font-family: arial;
+}
 </style>
 
 <body>
@@ -77,10 +85,39 @@ $(document).ready(function() {
             }
         },
         series: [{
+        	type: 'flags',
+            name: 'Alerts',
+            data: [],
+            onSeries: 'soundLevel',
+            color: '#eee',
+            fillColor: '#ffffcc',
+            width: 12,
+            style : {
+				color : '#900',
+				fontSize: '12pt'
+			},
+        }, {
         	id: 'soundLevel',
-            name: 'Sound Level',
-            data: []
+        	type: 'areaspline',
+        	shadow : true,
+        	name: 'Sound Level',
+            data: [],
+			fillColor : {
+				linearGradient : {
+					x1: 0, 
+					y1: 0, 
+					x2: 0, 
+					y2: 1
+				},
+				stops : [
+					[0, '#dc0000'], 
+					[1, '#ffeeee']
+				]
+			}
         }],
+        navigator: {
+        	baseSeries: 'soundLevel'
+        },
         colors: ['#dc0000'],
         yAxis: {
         	min: 0,
@@ -127,11 +164,16 @@ $(document).ready(function() {
     	var value;
     	var time;
     	chart.series[0].setData([]);
+    	chart.series[1].setData([]);
     	for (var i = 0; i < results.length; i++) {
     		if (results[i].eventType == 'Measurements') {
     			time = kendo.parseDate(results[i].eventDate).getTime();
     			value = [time, results[i].measurements['sound.level']];
-    			chart.series[0].addPoint(value, false);
+    			chart.series[1].addPoint(value, false, false, false);
+    		} else if (results[i].eventType == 'Alert') {
+    			time = kendo.parseDate(results[i].eventDate).getTime();
+    			value = {x: time, title: '\uf071', text: results[i].message};
+    			chart.series[0].addPoint(value, false, false, false);
     		}
     	}
     	chart.redraw();
