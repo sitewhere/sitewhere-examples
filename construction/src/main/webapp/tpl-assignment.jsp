@@ -20,7 +20,6 @@
 			<div class="assignment-data">
 				<h1>#:associatedHardware.name#</h1>
 				<div class="asset-details">
-					<h2><span class="fldlabel">VIN:</span> #:metadata[0].value#</h2>
 					<h2><span class="fldlabel">SKU:</span> #:associatedHardware.sku#</h2>
 				</div>
 			</div>

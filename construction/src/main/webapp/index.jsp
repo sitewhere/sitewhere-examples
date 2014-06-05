@@ -252,7 +252,12 @@ $(document).ready(function() {
 	
 	/** Called when assignments have been loaded */
 	function onAssignmentsLoaded(data, status, jqXHR) {
-		assignments = data.results;
+		assignments = [];
+		for (var i = 0; i < data.results.length; i++) {
+			if (data.results[i].assignmentType != 'Unassociated') {
+				assignments.push(data.results[i]);
+			}
+		}
 		var template = kendo.template($("#tpl-assignment").html());
 		var html = "";
 		for (var x = 0; x < assignments.length; x++) {

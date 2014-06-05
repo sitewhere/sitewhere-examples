@@ -21,7 +21,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<warName>construction</warName>
+					<warName>soundmon</warName>
 					<outputDirectory>${project.basedir}/deploy</outputDirectory>
 				</configuration>
 				<executions>
