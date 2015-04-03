@@ -1,0 +1,41 @@
+<hardware-assets>
+	<hardware-asset id="A330-200" name="Airbus A330-200" sku="A330-200">
+		<description>The Airbus A330 is a medium wide-body twin-engine jet airliner made by
+			Airbus, a division of Airbus Group.</description>
+		<image-url>https://s3.amazonaws.com/sitewhere-demo/airport/a330-200.jpg</image-url>
+		<property name="manufacturer" value="Airbus"/>
+		<property name="passengers" value="234"/>
+		<property name="cruiseSpeed" value="567"/>
+		<property name="range" value="7021"/>
+	</hardware-asset>
+	<hardware-asset id="A330-300" name="Airbus A330-300" sku="A330-300">
+		<description>The Airbus A330 is a medium wide-body twin-engine jet airliner made by
+			Airbus, a division of Airbus Group.</description>
+		<image-url>https://s3.amazonaws.com/sitewhere-demo/airport/a330-300.jpg</image-url>
+		<property name="manufacturer" value="Airbus"/>
+		<property name="passengers" value="293"/>
+		<property name="cruiseSpeed" value="567"/>
+		<property name="range" value="7021"/>
+	</hardware-asset>
+	<hardware-asset id="BOEING-717" name="Boeing 717" sku="BOEING-717">
+		<description>The Boeing 717 is a twin-engine, single-aisle jet airliner, developed for
+			the 100-seat market. The airliner was designed and originally marketed by McDonnell
+			Douglas as the MD-95, a derivative of the DC-9 family.</description>
+		<image-url>https://s3.amazonaws.com/sitewhere-demo/airport/boeing717.jpg</image-url>
+		<property name="manufacturer" value="Boeing"/>
+		<property name="passengers" value="110"/>
+		<property name="cruiseSpeed" value="504"/>
+		<property name="range" value="2371"/>
+	</hardware-asset>
+	<hardware-asset id="BOEING-737" name="Boeing 737-700" sku="BOEING-737">
+		<description>The Boeing 737 is a short- to medium-range twinjet narrow-body airliner.
+			Originally developed as a shorter, lower-cost twin-engined airliner derived from
+			Boeing's 707 and 727, the 737 has developed into a family of nine passenger models with
+			a capacity of 85 to 215 passengers.</description>
+		<image-url>https://s3.amazonaws.com/sitewhere-demo/airport/boeing737.jpg</image-url>
+		<property name="manufacturer" value="Boeing"/>
+		<property name="passengers" value="124"/>
+		<property name="cruiseSpeed" value="624"/>
+		<property name="range" value="4400"/>
+	</hardware-asset>
+</hardware-assets>

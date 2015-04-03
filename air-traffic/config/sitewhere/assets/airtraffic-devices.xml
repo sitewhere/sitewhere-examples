@@ -1,0 +1,7 @@
+<hardware-assets>
+	<hardware-asset id="FMZ2000" name="FMZ 2000" sku="FMZ2000" device="true">
+		<description>Flight Management System of choice for pilots and OEMs for nearly 20 years. Today there are well over 3,000 aircraft in service with the FMZ-2000.</description>
+		<image-url>https://s3.amazonaws.com/sitewhere-demo/airport/fmz2000.jpg</image-url>
+		<property name="manufacturer" value="Honeywell"/>
+	</hardware-asset>
+</hardware-assets>

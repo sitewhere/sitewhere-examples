@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="air-traffic/src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-client/1.0.2/sitewhere-client-1.0.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-core/1.0.2/sitewhere-core-1.0.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.2.10.RELEASE/spring-web-3.2.10.RELEASE.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
