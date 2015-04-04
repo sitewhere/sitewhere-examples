@@ -26,8 +26,18 @@ public class Route {
 	 * @return
 	 */
 	public static Route random() {
+		return Route.startingWith(Airport.random());
+	}
+
+	/**
+	 * Create a route starting with a given airport.
+	 * 
+	 * @param departure
+	 * @return
+	 */
+	public static Route startingWith(Airport departure) {
 		Route route = new Route();
-		route.setDeparture(Airport.random());
+		route.setDeparture(departure);
 		route.setDestination(Airport.random());
 		while (route.getDeparture() == route.getDestination()) {
 			route.setDestination(Airport.random());

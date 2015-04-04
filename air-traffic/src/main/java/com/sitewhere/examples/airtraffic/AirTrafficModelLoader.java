@@ -319,14 +319,17 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @throws SiteWhereException
 		 */
 		protected void generateEventData() throws SiteWhereException {
+			Map<String, Route> routes = new HashMap<String, Route>();
 			while (true) {
 				DeviceAssignmentSearchResults results = client.listAssignmentsForSite(site.getToken());
 				List<DeviceAssignment> assignments = results.getResults();
 
 				// Create routes for all assignments.
-				Map<String, Route> routes = new HashMap<String, Route>();
 				for (DeviceAssignment assignment : assignments) {
-					Route route = Route.random();
+					Route existing = routes.get(assignment.getToken());
+					Route route =
+							(existing != null) ? Route.startingWith(existing.getDestination())
+									: Route.random();
 					routes.put(assignment.getToken(), route);
 				}
 
