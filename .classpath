@@ -10,5 +10,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/activemq/activemq-all/5.10.0/activemq-all-5.10.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.1.1/jackson-databind-2.1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.1.1/jackson-core-2.1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/3.2.10.RELEASE/spring-context-3.2.10.RELEASE.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/3.2.10.RELEASE/spring-beans-3.2.10.RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

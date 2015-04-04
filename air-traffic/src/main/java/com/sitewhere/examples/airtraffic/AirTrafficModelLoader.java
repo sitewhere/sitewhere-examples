@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitewhere.examples.airtraffic.client.SiteWhereClientExt;
+import com.sitewhere.examples.airtraffic.rest.model.Flight;
 import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
 import com.sitewhere.rest.model.device.event.DeviceEventBatch;
@@ -65,10 +66,10 @@ public class AirTrafficModelLoader extends HttpServlet {
 	private static final String SITE_ID = "9d0f4ddd-3d9c-480e-ab5b-5b1da0efcbd8";
 
 	/** Number of planes to track */
-	private static final int PLANE_COUNT = 25;
+	private static final int PLANE_COUNT = 30;
 
 	/** Number of steps in route */
-	private static final int NUM_STEPS = 20;
+	private static final int NUM_STEPS = 50;
 
 	/** Mapper used for marshaling event create requests */
 	private static ObjectMapper MAPPER = new ObjectMapper();
@@ -343,20 +344,29 @@ public class AirTrafficModelLoader extends HttpServlet {
 
 				// Step through routes and calculate current position.
 				for (int i = 0; i < NUM_STEPS; i++) {
+					List<Flight> flights = new ArrayList<Flight>();
 					for (DeviceAssignment assignment : assignments) {
 						Route route = routes.get(assignment.getToken());
-						double latDelta =
-								(route.getDestination().getLatitude() - route.getDeparture().getLatitude())
-										/ (double) NUM_STEPS;
-						double lonDelta =
-								(route.getDestination().getLongitude() - route.getDeparture().getLongitude())
-										/ (double) NUM_STEPS;
+						double slat = route.getDeparture().getLatitude();
+						double elat = route.getDestination().getLatitude();
+						double slon = route.getDeparture().getLongitude();
+						double elon = route.getDestination().getLongitude();
+						double latDelta = (elat - slat) / (double) NUM_STEPS;
+						double lonDelta = (elon - slon) / (double) NUM_STEPS;
 						double lat = route.getDeparture().getLatitude() + (i * latDelta);
 						double lon = route.getDeparture().getLongitude() + (i * lonDelta);
+						double heading = (270 - Math.atan2(slat - elat, slon - elon) * 180 / Math.PI) % 360;
+						double elevation =
+								Math.sin(i / (double) NUM_STEPS * Math.PI)
+										* (10000.0 + route.getAltitudeMultiplier() * 1000);
+						double fuelLevel = 1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330);
+
 						sendEvents(connection, assignment, route, lat, lon);
+						flights.add(createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel));
 					}
+					AirTraffic.getInstance().setFlights(flights);
 					try {
-						Thread.sleep(2000);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						return;
 					}
@@ -368,6 +378,32 @@ public class AirTrafficModelLoader extends HttpServlet {
 					throw new SiteWhereException("Unable to disconnect from Stomp server.", e);
 				}
 			}
+		}
+
+		/**
+		 * Create a {@link Flight} object from current data.
+		 * 
+		 * @param assignment
+		 * @param route
+		 * @param lat
+		 * @param lon
+		 * @param elevation
+		 * @param heading
+		 * @param fuelLevel
+		 * @return
+		 */
+		protected Flight createFlight(DeviceAssignment assignment, Route route, double lat, double lon,
+				double elevation, double heading, double fuelLevel) {
+			Flight flight = new Flight();
+			flight.setAssignmentToken(assignment.getToken());
+			flight.setDeviceHardwareId(assignment.getDevice().getHardwareId());
+			flight.setPlaneModel(assignment.getAssetName());
+			flight.setLatitude(lat);
+			flight.setLongitude(lon);
+			flight.setElevation(elevation);
+			flight.setHeading(heading);
+			flight.setFuelLevel(fuelLevel);
+			return flight;
 		}
 
 		/**

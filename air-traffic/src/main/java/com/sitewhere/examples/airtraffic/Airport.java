@@ -36,7 +36,17 @@ public enum Airport {
 
 	IAH("George Bush Intercontinental Houston Airport", 29.9843998, -95.3414001),
 
-	MIA("Miami International Airport", 25.7931995, -80.2906036);
+	MIA("Miami International Airport", 25.7931995, -80.2906036),
+
+	MCO("Orlando International Airport", 28.4293995, -81.3089981),
+
+	EWR("Newark Liberty International Airport", 40.6925011, -74.1687012),
+
+	SEA("Seattle Tacoma International Airport", 47.4490013, -122.3089981),
+
+	MSP("Minneapolis-St Paul International/Wold-Chamberlain Airport", 44.882, -93.2218018),
+
+	DTW("Detroit Metropolitan Wayne County Airport", 42.2123985, -83.3534012);
 
 	/** Airport code */
 	private String name;

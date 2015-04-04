@@ -20,6 +20,12 @@ public class Route {
 	/** Destination airport */
 	private Airport destination;
 
+	/** Used to affect rate of fuel consumption */
+	private double fuelMultiplier;
+
+	/** Used to affect max altitude */
+	private double altitudeMultiplier;
+
 	/**
 	 * Choose a random route.
 	 * 
@@ -42,6 +48,8 @@ public class Route {
 		while (route.getDeparture() == route.getDestination()) {
 			route.setDestination(Airport.random());
 		}
+		route.setFuelMultiplier(Math.random() * 3);
+		route.setAltitudeMultiplier(Math.random() * 20);
 		return route;
 	}
 
@@ -59,5 +67,21 @@ public class Route {
 
 	public void setDestination(Airport destination) {
 		this.destination = destination;
+	}
+
+	public double getFuelMultiplier() {
+		return fuelMultiplier;
+	}
+
+	public void setFuelMultiplier(double fuelMultiplier) {
+		this.fuelMultiplier = fuelMultiplier;
+	}
+
+	public double getAltitudeMultiplier() {
+		return altitudeMultiplier;
+	}
+
+	public void setAltitudeMultiplier(double altitudeMultiplier) {
+		this.altitudeMultiplier = altitudeMultiplier;
 	}
 }
