@@ -26,6 +26,8 @@ body {
 
 <body>
 	<div id="map" style="width: 100%; height: 100%; position: absolute;"></div>
+	<img src="images/AirTrafficBanner.png"
+		style="position: fixed; top: 10px; left: 50%; margin-left: -250px;" />
 </body>
 
 <script type="text/javascript">
