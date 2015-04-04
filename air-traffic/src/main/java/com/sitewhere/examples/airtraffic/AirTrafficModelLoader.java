@@ -1,6 +1,7 @@
 package com.sitewhere.examples.airtraffic;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,16 @@ import java.util.concurrent.Executors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.activemq.transport.stomp.StompConnection;
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitewhere.examples.airtraffic.client.SiteWhereClientExt;
 import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
+import com.sitewhere.rest.model.device.event.DeviceEventBatch;
+import com.sitewhere.rest.model.device.event.request.DeviceLocationCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceAssignmentCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceSpecificationCreateRequest;
@@ -63,6 +69,9 @@ public class AirTrafficModelLoader extends HttpServlet {
 
 	/** Number of steps in route */
 	private static final int NUM_STEPS = 20;
+
+	/** Mapper used for marshaling event create requests */
+	private static ObjectMapper MAPPER = new ObjectMapper();
 
 	/** Executor that runs processing in the background */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -321,17 +330,27 @@ public class AirTrafficModelLoader extends HttpServlet {
 					routes.put(assignment.getToken(), route);
 				}
 
+				StompConnection connection = new StompConnection();
+				try {
+					connection.open("localhost", 2345);
+					connection.connect("system", "manager");
+				} catch (Exception e) {
+					throw new SiteWhereException("Unable to connect to Stomp server.", e);
+				}
+
 				// Step through routes and calculate current position.
 				for (int i = 0; i < NUM_STEPS; i++) {
 					for (DeviceAssignment assignment : assignments) {
 						Route route = routes.get(assignment.getToken());
 						double latDelta =
-								route.getDeparture().getLatitude() - route.getDestination().getLatitude();
+								(route.getDestination().getLatitude() - route.getDeparture().getLatitude())
+										/ (double) NUM_STEPS;
 						double lonDelta =
-								route.getDeparture().getLongitude() - route.getDestination().getLongitude();
+								(route.getDestination().getLongitude() - route.getDeparture().getLongitude())
+										/ (double) NUM_STEPS;
 						double lat = route.getDeparture().getLatitude() + (i * latDelta);
 						double lon = route.getDeparture().getLongitude() + (i * lonDelta);
-						sendEvents(assignment, route, lat, lon);
+						sendEvents(connection, assignment, route, lat, lon);
 					}
 					try {
 						Thread.sleep(2000);
@@ -339,22 +358,75 @@ public class AirTrafficModelLoader extends HttpServlet {
 						return;
 					}
 				}
+
+				try {
+					connection.disconnect();
+				} catch (Exception e) {
+					throw new SiteWhereException("Unable to disconnect from Stomp server.", e);
+				}
 			}
 		}
 
 		/**
 		 * Send events for a single step of a route.
 		 * 
+		 * @param connection
 		 * @param assignment
 		 * @param route
 		 * @param lat
 		 * @param lon
 		 * @throws SiteWhereException
 		 */
-		protected void sendEvents(DeviceAssignment assignment, Route route, double lat, double lon)
+		protected void sendEvents(StompConnection connection, DeviceAssignment assignment, Route route,
+				double lat, double lon) throws SiteWhereException {
+
+			String payload = createJson(assignment, route, lat, lon);
+
+			try {
+				connection.begin("tx1");
+				connection.send("/queue/SITEWHERE.STOMP", payload, "tx1", null);
+				connection.commit("tx1");
+			} catch (Exception e) {
+				LOGGER.error("Unable to send event data via Stomp.", e);
+			}
+		}
+
+		/**
+		 * Create JSON payload for events.
+		 * 
+		 * @param assignment
+		 * @param route
+		 * @param lat
+		 * @param lon
+		 * @return
+		 * @throws SiteWhereException
+		 */
+		protected String createJson(DeviceAssignment assignment, Route route, double lat, double lon)
 				throws SiteWhereException {
-			LOGGER.info("Sending " + assignment.getToken() + "[" + route.getDeparture() + "->"
-					+ route.getDestination() + "] (" + lat + "," + lon + ")");
+			DeviceEventBatch batch = new DeviceEventBatch();
+			batch.setHardwareId(assignment.getDevice().getHardwareId());
+			DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
+			location.setElevation(0.0);
+			location.setLatitude(lat);
+			location.setLongitude(lon);
+			location.setEventDate(new Date());
+
+			Map<String, String> metadata = new HashMap<String, String>();
+			metadata.put("departure", route.getDeparture().name());
+			metadata.put("destination", route.getDestination().name());
+			location.setMetadata(metadata);
+
+			batch.getLocations().add(location);
+			// DeviceMeasurementsCreateRequest request = new
+			// DeviceMeasurementsCreateRequest();
+			// request.setEventDate(new Date());
+			// request.addOrReplaceMeasurement("engine.temp", 98.76);
+			// batch.getMeasurements().add(request);
+			try {
+				return MAPPER.writeValueAsString(batch);
+			} catch (JsonProcessingException e) {
+				throw new SiteWhereException("Unable to marshal JSON payload.", e);
+			}
 		}
 	}
 }
