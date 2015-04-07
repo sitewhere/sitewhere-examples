@@ -19,10 +19,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitewhere.examples.airtraffic.client.SiteWhereClientExt;
 import com.sitewhere.examples.airtraffic.rest.model.Flight;
+import com.sitewhere.examples.airtraffic.rest.model.MarshaledRoute;
 import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
 import com.sitewhere.rest.model.device.event.DeviceEventBatch;
 import com.sitewhere.rest.model.device.event.request.DeviceLocationCreateRequest;
+import com.sitewhere.rest.model.device.event.request.DeviceMeasurementsCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceAssignmentCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceSpecificationCreateRequest;
@@ -64,6 +66,9 @@ public class AirTrafficModelLoader extends HttpServlet {
 
 	/** UUID that identifies the Air Traffic site */
 	private static final String SITE_ID = "9d0f4ddd-3d9c-480e-ab5b-5b1da0efcbd8";
+
+	/** Metadata value for flight number */
+	private static final String MD_FLIGHT_NUMBER = "flightNumber";
 
 	/** Number of planes to track */
 	private static final int PLANE_COUNT = 30;
@@ -304,7 +309,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 
 				int flightNumber = (int) Math.floor(Math.random() * 10000);
 				Map<String, String> metadata = new HashMap<String, String>();
-				metadata.put("flightNumber", "SW-" + flightNumber);
+				metadata.put(MD_FLIGHT_NUMBER, "SW-" + flightNumber);
 				create.setMetadata(metadata);
 
 				assignments.add(client.createDeviceAssignment(create));
@@ -359,10 +364,18 @@ public class AirTrafficModelLoader extends HttpServlet {
 						double elevation =
 								Math.sin(i / (double) NUM_STEPS * Math.PI)
 										* (10000.0 + route.getAltitudeMultiplier() * 1000);
-						double fuelLevel = 1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330);
+						double fuelLevel =
+								1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330)
+										+ (Math.random() * 30.0) - 15.0;
+						double airspeed =
+								200.0 + (Math.sin(i / (double) NUM_STEPS * Math.PI) * 250.0)
+										+ (Math.random() * 80.0) - 40.0;
 
-						sendEvents(connection, assignment, route, lat, lon);
-						flights.add(createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel));
+						Flight flight =
+								createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel,
+										airspeed);
+						sendEvents(connection, assignment, route, flight);
+						flights.add(flight);
 					}
 					AirTraffic.getInstance().setFlights(flights);
 					try {
@@ -390,20 +403,34 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @param elevation
 		 * @param heading
 		 * @param fuelLevel
+		 * @param airspeed
 		 * @return
 		 */
 		protected Flight createFlight(DeviceAssignment assignment, Route route, double lat, double lon,
-				double elevation, double heading, double fuelLevel) {
+				double elevation, double heading, double fuelLevel, double airspeed) {
 			Flight flight = new Flight();
 			flight.setAssignmentToken(assignment.getToken());
 			flight.setDeviceHardwareId(assignment.getDevice().getHardwareId());
 			flight.setPlaneModel(assignment.getAssetName());
+			flight.setRoute(new MarshaledRoute(route));
 			flight.setLatitude(lat);
 			flight.setLongitude(lon);
-			flight.setElevation(elevation);
-			flight.setHeading(heading);
-			flight.setFuelLevel(fuelLevel);
+			flight.setElevation(roundToTwoDecimals(elevation));
+			flight.setHeading(roundToTwoDecimals(heading));
+			flight.setFuelLevel(roundToTwoDecimals(fuelLevel));
+			flight.setAirspeed(roundToTwoDecimals(airspeed));
+			flight.setFlightNumber(assignment.getMetadata(MD_FLIGHT_NUMBER));
 			return flight;
+		}
+
+		/**
+		 * Round a double value to two decimal points.
+		 * 
+		 * @param value
+		 * @return
+		 */
+		protected double roundToTwoDecimals(double value) {
+			return Math.floor(value * 100.0) / 100.0;
 		}
 
 		/**
@@ -412,14 +439,13 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @param connection
 		 * @param assignment
 		 * @param route
-		 * @param lat
-		 * @param lon
+		 * @param flight
 		 * @throws SiteWhereException
 		 */
 		protected void sendEvents(StompConnection connection, DeviceAssignment assignment, Route route,
-				double lat, double lon) throws SiteWhereException {
+				Flight flight) throws SiteWhereException {
 
-			String payload = createJson(assignment, route, lat, lon);
+			String payload = createJson(assignment, route, flight);
 
 			try {
 				connection.begin("tx1");
@@ -435,32 +461,35 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * 
 		 * @param assignment
 		 * @param route
-		 * @param lat
-		 * @param lon
+		 * @param flight
 		 * @return
 		 * @throws SiteWhereException
 		 */
-		protected String createJson(DeviceAssignment assignment, Route route, double lat, double lon)
+		protected String createJson(DeviceAssignment assignment, Route route, Flight flight)
 				throws SiteWhereException {
 			DeviceEventBatch batch = new DeviceEventBatch();
 			batch.setHardwareId(assignment.getDevice().getHardwareId());
-			DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
-			location.setElevation(0.0);
-			location.setLatitude(lat);
-			location.setLongitude(lon);
-			location.setEventDate(new Date());
 
+			// Create request for new device location event.
+			DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
+			location.setElevation(flight.getElevation());
+			location.setLatitude(flight.getLatitude());
+			location.setLongitude(flight.getLongitude());
+			location.setEventDate(new Date());
 			Map<String, String> metadata = new HashMap<String, String>();
 			metadata.put("departure", route.getDeparture().name());
 			metadata.put("destination", route.getDestination().name());
 			location.setMetadata(metadata);
-
 			batch.getLocations().add(location);
-			// DeviceMeasurementsCreateRequest request = new
-			// DeviceMeasurementsCreateRequest();
-			// request.setEventDate(new Date());
-			// request.addOrReplaceMeasurement("engine.temp", 98.76);
-			// batch.getMeasurements().add(request);
+
+			// Create request for new device measurements event.
+			DeviceMeasurementsCreateRequest request = new DeviceMeasurementsCreateRequest();
+			request.setEventDate(new Date());
+			request.addOrReplaceMeasurement("fuel.level", flight.getFuelLevel());
+			request.addOrReplaceMeasurement("air.speed", flight.getAirspeed());
+			request.addOrReplaceMeasurement("heading", flight.getHeading());
+			batch.getMeasurements().add(request);
+
 			try {
 				return MAPPER.writeValueAsString(batch);
 			} catch (JsonProcessingException e) {

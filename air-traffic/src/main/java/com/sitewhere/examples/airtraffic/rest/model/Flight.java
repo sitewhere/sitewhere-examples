@@ -7,6 +7,7 @@
  */
 package com.sitewhere.examples.airtraffic.rest.model;
 
+
 /**
  * Model object for a flight.
  * 
@@ -25,6 +26,9 @@ public class Flight {
 
 	/** Flight number */
 	private String flightNumber;
+
+	/** Route being flown */
+	private MarshaledRoute route;
 
 	/** Location latitude */
 	private double latitude;
@@ -74,6 +78,14 @@ public class Flight {
 
 	public void setFlightNumber(String flightNumber) {
 		this.flightNumber = flightNumber;
+	}
+
+	public MarshaledRoute getRoute() {
+		return route;
+	}
+
+	public void setRoute(MarshaledRoute route) {
+		this.route = route;
 	}
 
 	public double getLatitude() {
