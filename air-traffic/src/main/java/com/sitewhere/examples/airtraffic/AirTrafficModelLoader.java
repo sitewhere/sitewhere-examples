@@ -17,9 +17,9 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitewhere.examples.airtraffic.client.SiteWhereClientExt;
 import com.sitewhere.examples.airtraffic.rest.model.Flight;
 import com.sitewhere.examples.airtraffic.rest.model.MarshaledRoute;
+import com.sitewhere.rest.client.SiteWhereClient;
 import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
 import com.sitewhere.rest.model.device.event.DeviceEventBatch;
@@ -31,6 +31,7 @@ import com.sitewhere.rest.model.device.request.DeviceSpecificationCreateRequest;
 import com.sitewhere.rest.model.device.request.SiteCreateRequest;
 import com.sitewhere.rest.model.search.DeviceAssignmentSearchResults;
 import com.sitewhere.rest.model.search.SearchResults;
+import com.sitewhere.spi.ISiteWhereClient;
 import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.SiteWhereSystemException;
 import com.sitewhere.spi.device.DeviceAssignmentType;
@@ -83,7 +84,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	/** SiteWhere client using default connectivity */
-	private SiteWhereClientExt client;
+	private ISiteWhereClient client;
 
 	/** Site information */
 	private ISite site;
@@ -108,7 +109,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		client = new SiteWhereClientExt();
+		client = new SiteWhereClient();
 		executor.execute(new AirTrafficModel());
 	}
 
