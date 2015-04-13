@@ -351,6 +351,13 @@ public class AirTrafficModelLoader extends HttpServlet {
 				// Step through routes and calculate current position.
 				for (int i = 0; i < NUM_STEPS; i++) {
 					List<Flight> flights = new ArrayList<Flight>();
+
+					try {
+						connection.begin("tx1");
+					} catch (Exception e) {
+						throw new SiteWhereException("Unable to connect to Stomp server.", e);
+					}
+
 					for (DeviceAssignment assignment : assignments) {
 						Route route = routes.get(assignment.getToken());
 						double slat = route.getDeparture().getLatitude();
@@ -378,6 +385,13 @@ public class AirTrafficModelLoader extends HttpServlet {
 						sendEvents(connection, assignment, route, flight);
 						flights.add(flight);
 					}
+
+					try {
+						connection.commit("tx1");
+					} catch (Exception e) {
+						throw new SiteWhereException("Unable to commit data on Stomp connection.", e);
+					}
+
 					AirTraffic.getInstance().setFlights(flights);
 					try {
 						Thread.sleep(1000);
@@ -389,7 +403,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 				try {
 					connection.disconnect();
 				} catch (Exception e) {
-					throw new SiteWhereException("Unable to disconnect from Stomp server.", e);
+					throw new SiteWhereException("Unable to commit data on Stomp connection.", e);
 				}
 			}
 		}
@@ -446,19 +460,28 @@ public class AirTrafficModelLoader extends HttpServlet {
 		protected void sendEvents(StompConnection connection, DeviceAssignment assignment, Route route,
 				Flight flight) throws SiteWhereException {
 
-			String payload = createJson(assignment, route, flight);
+			boolean useStomp = true;
+			DeviceEventBatch batch = createDeviceEventBatch(assignment, route, flight);
+			if (useStomp) {
+				String json = null;
+				try {
+					json = MAPPER.writeValueAsString(batch);
+				} catch (JsonProcessingException e) {
+					throw new SiteWhereException("Unable to marshal JSON payload.", e);
+				}
 
-			try {
-				connection.begin("tx1");
-				connection.send("/queue/SITEWHERE.STOMP", payload, "tx1", null);
-				connection.commit("tx1");
-			} catch (Exception e) {
-				LOGGER.error("Unable to send event data via Stomp.", e);
+				try {
+					connection.send("/queue/SITEWHERE.STOMP", json, "tx1", null);
+				} catch (Exception e) {
+					LOGGER.error("Unable to send event data via Stomp.", e);
+				}
+			} else {
+				(new SiteWhereClient()).addDeviceEventBatch(batch.getHardwareId(), batch);
 			}
 		}
 
 		/**
-		 * Create JSON payload for events.
+		 * Create {@link DeviceEventBatch} from assignment data.
 		 * 
 		 * @param assignment
 		 * @param route
@@ -466,8 +489,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @return
 		 * @throws SiteWhereException
 		 */
-		protected String createJson(DeviceAssignment assignment, Route route, Flight flight)
-				throws SiteWhereException {
+		protected DeviceEventBatch createDeviceEventBatch(DeviceAssignment assignment, Route route,
+				Flight flight) throws SiteWhereException {
 			DeviceEventBatch batch = new DeviceEventBatch();
 			batch.setHardwareId(assignment.getDevice().getHardwareId());
 
@@ -491,11 +514,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 			request.addOrReplaceMeasurement("heading", flight.getHeading());
 			batch.getMeasurements().add(request);
 
-			try {
-				return MAPPER.writeValueAsString(batch);
-			} catch (JsonProcessingException e) {
-				throw new SiteWhereException("Unable to marshal JSON payload.", e);
-			}
+			return batch;
 		}
 	}
 }
