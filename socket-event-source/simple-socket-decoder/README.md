@@ -18,7 +18,7 @@ which will listen on localhost port 8585:
 
 Note that this configuration spawns 10 threads that decode requests concurrently.
 It also uses **read-all-interaction-handler-factory** which will read all of the 
-content from the socket and hand of the result to the custom decoder. This 
+content from the socket and hand off the result to the custom decoder. This 
 configuration makes sense when there are no conversational aspects in the socket
 interaction. The message is passed to a custom decoder declared in a Spring
 bean as shown below:
@@ -58,3 +58,14 @@ For an example of how to send data to the server socket from java, look at the
 data that has been posted to the device, open the SiteWhere administrative application and navigate to 
 the current assignment for the device. New entries should appear under the **Locations** and **Measurements** 
 tabs.
+
+Understanding How it Works
+--------------------------
+In this example, very little code is needed since the socket interaction is very simple. The
+**socket-event-source** takes care of setting up a server socket and handling multithreaded 
+processing. The **read-all-interaction-handler-factory** takes care of reading data from the
+socket and sending it to the custom decoder. In more complex cases, a custom interaction handler
+can be used to allow for a back-and-forth exchange of messages between the device and the
+system. In this example, the only custom code is the decoding of messages from the device into
+SiteWhere events. This takes place in the [SimpleSocketDecoder] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/simple-socket-decoder/src/main/java/com/sitewhere/examples/socket/SimpleSocketDecoder.java), which takes a binary payload as input, converts it to a String, then
+parses the String to extract data needed to create SiteWhere events.
