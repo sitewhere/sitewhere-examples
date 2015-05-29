@@ -50,4 +50,11 @@ in the root folder of the example. Once the build has completed, a **simple-deco
 will be located in the **target** folder. Copy the jar into your SiteWhere **/webapps/sitewhere/WEB-INF/lib**
 folder. Also copy the configuration file from the **config/sitewhere** folder in the example into
 your **/conf/sitewhere/** folder to replace the existing configuration. You may want to create a backup
-of the original configuration beforehand.
+of the original configuration beforehand. Start SiteWhere and it should be ready to process messages
+sent to port 8585 in the expected format.
+
+For an example of how to send data to the server socket from java, look at the 
+[JUnit test case] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/simple-socket-decoder/src/main/java/com/sitewhere/examples/socket/SimpleSocketDecoderTest.java). Running the tests will send test messages to the server. To view the
+data that has been posted to the device, open the SiteWhere administrative application and navigate to 
+the current assignment for the device. New entries should appear under the **Locations** and **Measurements** 
+tabs.
