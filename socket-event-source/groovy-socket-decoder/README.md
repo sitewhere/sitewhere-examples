@@ -73,9 +73,10 @@ example decoder script is shown below:
 
 The script expects an input in the form of **LOC,XXXXXXXX,33.7550,-84.3900**, where the
 first part is **LOC** to indicate a location packet, the second is the unique hardware
-id for the device, and the third and fourth parts are latitude and longitude. The binary
-payload is converted to a String and split as comma-separated data. The remaining code
-does some sanity checking, then creates a [DecodedDeviceRequest] (http://docs.sitewhere.org/current/apidocs/com/sitewhere/rest/model/device/communication/DecodedDeviceRequest.html) 
+id for the device, and the third and fourth parts are latitude and longitude. 
+
+The binary payload is converted to a String and split as comma-separated data. 
+The remaining code does some sanity checking, then creates a [DecodedDeviceRequest] (http://docs.sitewhere.org/current/apidocs/com/sitewhere/rest/model/device/communication/DecodedDeviceRequest.html) 
 which wraps a [DeviceLocationCreateRequest] (http://docs.sitewhere.org/current/apidocs/com/sitewhere/rest/model/device/event/request/DeviceLocationCreateRequest.html).
 The resulting object is added to the **events** variable which is used by SiteWhere to
 pass new events into the system to be stored and forwarded.
