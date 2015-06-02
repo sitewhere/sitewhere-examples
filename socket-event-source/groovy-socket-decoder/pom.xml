@@ -6,10 +6,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sitewhere.examples</groupId>
-	<artifactId>simple-socket-decoder</artifactId>
+	<artifactId>groovy-socket-decoder</artifactId>
 	<version>${sitewhere.version}</version>
 	<packaging>jar</packaging>
-	<name>SiteWhere Simple Socket Decoder Example</name>
+	<name>SiteWhere Groovy Socket Decoder Example</name>
 	<url>http://www.sitewhere.com</url>
 
 	<dependencies>
