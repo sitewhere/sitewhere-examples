@@ -14,11 +14,11 @@ script:
 	<!-- Event source for processing custom messages from a socket -->
 	<sw:socket-event-source port="8585" numThreads="10" sourceId="socket">
 		<sw:read-all-interaction-handler-factory/>
-		<sw:groovy-event-decoder scriptPath="binaryDecoder.groovy"/>
+		<sw:groovy-event-decoder scriptPath="decoder.groovy"/>
 	</sw:socket-event-source>
 ```
 
-In this case, the binary payload is handed to a script called **binaryDecoder.groovy**
+In this case, the binary payload is handed to a script called **decoder.groovy**
 which will be resolved from the **/conf/sitewhere/groovy** folder under SiteWhere root.
 In order to use the **groovy-event-decoder**, you must add the following 
 declaration in the **globals** section as well:
@@ -38,7 +38,8 @@ example decoder script is shown below:
 	import com.sitewhere.spi.device.event.request.*;
 	
 	// Sanity-check payload.
-	def parts = payload.split(",");
+	def message = new String(payload);
+	def parts = message.split(",");
 	if (parts.length < 2) {
 	  logger.error("Invalid parameters")
 	  return;
@@ -47,8 +48,6 @@ example decoder script is shown below:
 	// Parse type and hardware id.
 	def type = parts[0]
 	def hwid = parts[1]
-	
-	// Create object to hold decoded event data.
 	
 	// Handle location event in the form LOC,HWID,LAT,LONG
 	if ("LOC".equals(type)) {
@@ -69,5 +68,15 @@ example decoder script is shown below:
 	  decoded.setRequest(location)
 	  
 	  events.add(decoded);
-}```
+	}
+```
+
+The script expects an input in the form of **LOC,XXXXXXXX,33.7550,-84.3900**, where the
+first part is **LOC** to indicate a location packet, the second is the unique hardware
+id for the device, and the third and fourth parts are latitude and longitude. The binary
+payload is converted to a String and split as comma-separated data. The remaining code
+does some sanity checking, then creates a [DecodedDeviceRequest] (http://docs.sitewhere.org/current/apidocs/com/sitewhere/rest/model/device/communication/DecodedDeviceRequest.html) 
+which wraps a [DeviceLocationCreateRequest] (http://docs.sitewhere.org/current/apidocs/com/sitewhere/rest/model/device/event/request/DeviceLocationCreateRequest.html).
+The resulting object is added to the **events** variable which is used by SiteWhere to
+pass new events into the system to be stored and forwarded.
 

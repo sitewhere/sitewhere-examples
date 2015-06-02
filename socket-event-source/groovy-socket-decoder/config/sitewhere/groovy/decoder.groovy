@@ -3,7 +3,8 @@ import com.sitewhere.rest.model.device.event.request.*;
 import com.sitewhere.spi.device.event.request.*;
 
 // Sanity-check payload.
-def parts = payload.split(",");
+def message = new String(payload);
+def parts = message.split(",");
 if (parts.length < 2) {
   logger.error("Invalid parameters")
   return;
@@ -12,8 +13,6 @@ if (parts.length < 2) {
 // Parse type and hardware id.
 def type = parts[0]
 def hwid = parts[1]
-
-// Create object to hold decoded event data.
 
 // Handle location event in the form LOC,HWID,LAT,LONG
 if ("LOC".equals(type)) {
