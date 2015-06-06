@@ -61,5 +61,8 @@ sent to port 8585 in the expected format.
 Understanding How it Works
 --------------------------
 In order to create a custom event source, [LaipacEventSource] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-decoder/src/main/java/com/sitewhere/examples/socket/complex/LaipacEventSource.java) extends the existing [InboundEventSource] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-core/src/main/java/com/sitewhere/device/communication/InboundEventSource.java)
-base class and sets up a custom event receiver and event decoder.
+base class and sets up a custom event receiver and event decoder. The
+[LaipacEventReceiver] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-decoder/src/main/java/com/sitewhere/examples/socket/complex/LaipacEventReceiver.java) class extends the 
+[SocketInboundEventReceiver] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-core/src/main/java/com/sitewhere/device/communication/socket/SocketInboundEventReceiver.java) class and sets up a custom
+[ISocketInteractionHandler] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-client/src/main/java/com/sitewhere/spi/device/communication/socket/ISocketInteractionHandler.java) that handles the dialog between SiteWhere and the device.
 
