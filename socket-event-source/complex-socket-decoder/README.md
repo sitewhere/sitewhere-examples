@@ -66,3 +66,13 @@ base class and sets up a custom event receiver and event decoder. The
 [SocketInboundEventReceiver] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-core/src/main/java/com/sitewhere/device/communication/socket/SocketInboundEventReceiver.java) class and sets up a custom
 [ISocketInteractionHandler] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-client/src/main/java/com/sitewhere/spi/device/communication/socket/ISocketInteractionHandler.java) that handles the dialog between SiteWhere and the device.
 
+The [S911BLInterationHandler] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-decoder/src/main/java/com/sitewhere/examples/socket/complex/S911BLInterationHandler.java) class 
+handles all of the stateful logic in interacting with the device. It reads binary information from the socket, parsing
+it into messages that can be decoded into meaningful information. It also sends binary information back to the device
+in order to acknowledge receipt of information and request that specific data be sent. Note that the socket interaction
+handler is produced by a factory and a new instance is created per request so that state may be kept for a particlar
+session. This is required, since information often has to be assembled from many messages as the result of an extended
+interaction. As messages are decoded from the information, they are fed back to the event receiver, which in turn
+passes them to the 
+[LaipacEventDecoder] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-decoder/src/main/java/com/sitewhere/examples/socket/complex/LaipacEventDecoder.java) to be converted into SiteWhere events.
+
