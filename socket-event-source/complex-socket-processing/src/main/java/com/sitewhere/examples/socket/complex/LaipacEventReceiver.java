@@ -20,6 +20,6 @@ import com.sitewhere.spi.device.communication.IInboundEventReceiver;
 public class LaipacEventReceiver extends SocketInboundEventReceiver<LaipacContext> {
 
 	public LaipacEventReceiver() {
-		setHandlerFactory(new S911BLInterationHandler.Factory());
+		setHandlerFactory(new S911BLInteractionHandler.Factory());
 	}
 }

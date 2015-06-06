@@ -34,10 +34,10 @@ import com.sitewhere.spi.device.communication.socket.ISocketInteractionHandlerFa
  * 
  * @author Derek
  */
-public class S911BLInterationHandler implements ISocketInteractionHandler<LaipacContext> {
+public class S911BLInteractionHandler implements ISocketInteractionHandler<LaipacContext> {
 
 	/** Static logger instance */
-	private static Logger LOGGER = Logger.getLogger(S911BLInterationHandler.class);
+	private static Logger LOGGER = Logger.getLogger(S911BLInteractionHandler.class);
 
 	/** Serial number provided by AVSYS */
 	private String serialNumber;
@@ -222,7 +222,7 @@ public class S911BLInterationHandler implements ISocketInteractionHandler<Laipac
 	}
 
 	/**
-	 * Produces instances of {@link S911BLInterationHandler}.
+	 * Produces instances of {@link S911BLInteractionHandler}.
 	 * 
 	 * @author Derek
 	 */
@@ -237,7 +237,7 @@ public class S911BLInterationHandler implements ISocketInteractionHandler<Laipac
 		 */
 		@Override
 		public ISocketInteractionHandler<LaipacContext> newInstance() {
-			return new S911BLInterationHandler();
+			return new S911BLInteractionHandler();
 		}
 	}
 }
