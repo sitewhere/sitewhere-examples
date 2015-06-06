@@ -6,7 +6,8 @@ access the desired information.
 
 Interactions
 ------------
-The following is an overview of the interactions between the remote device and
+The following is an overview of the interactions between the remote device
+(a [Laipac S911] (http://www.laipac.com/bracelet_locator_gps.htm)) and
 the SiteWhere event receiver:
 
 1. Initial socket connection established.
