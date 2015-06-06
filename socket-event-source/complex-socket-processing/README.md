@@ -64,6 +64,11 @@ your **/conf/sitewhere/** folder to replace the existing configuration. You may 
 of the original configuration beforehand. Start SiteWhere and it should be ready to process messages
 sent to port 8585 in the expected format.
 
+For an example of how to send data to the server socket from java, look at the 
+[JUnit test case] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-processing/src/test/java/com/sitewhere/examples/socket/complex/ComplexSocketProcessingTest.java). Running the tests will send test messages to the server.
+The SiteWhere server logs will reflect the messages being parsed and the dialog going on between
+the device and the server.
+
 Understanding How it Works
 --------------------------
 In order to create a custom event source, [LaipacEventSource] (https://github.com/sitewhere/sitewhere-examples/blob/sitewhere-1.0.4/socket-event-source/complex-socket-processing/src/main/java/com/sitewhere/examples/socket/complex/LaipacEventSource.java) extends the existing [InboundEventSource] (https://github.com/sitewhere/sitewhere/blob/master/sitewhere-core/src/main/java/com/sitewhere/device/communication/InboundEventSource.java)
