@@ -6,7 +6,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sitewhere.examples</groupId>
-	<artifactId>complex-socket-decoder</artifactId>
+	<artifactId>complex-socket-processing</artifactId>
 	<version>${sitewhere.version}</version>
 	<packaging>jar</packaging>
 	<name>SiteWhere Complex Socket Decoder Example</name>

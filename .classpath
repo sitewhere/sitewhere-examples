@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="air-traffic/src/main/java"/>
-	<classpathentry kind="src" path="socket-event-source/complex-socket-decoder/src/main/java"/>
+	<classpathentry kind="src" path="socket-event-source/complex-socket-processing/src/main/java"/>
+	<classpathentry kind="src" path="socket-event-source/complex-socket-processing/src/test/java"/>
 	<classpathentry kind="src" path="socket-event-source/groovy-socket-decoder/src/test/java"/>
 	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/main/java"/>
 	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/test/java"/>
