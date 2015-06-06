@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="air-traffic/src/main/java"/>
+	<classpathentry kind="src" path="socket-event-source/complex-socket-decoder/src/main/java"/>
+	<classpathentry kind="src" path="socket-event-source/groovy-socket-decoder/src/test/java"/>
 	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/main/java"/>
 	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/test/java"/>
-	<classpathentry kind="src" path="socket-event-source/groovy-socket-decoder/src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
