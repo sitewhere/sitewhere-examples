@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitewhere.examples.airtraffic.rest.model.Flight;
 import com.sitewhere.examples.airtraffic.rest.model.MarshaledRoute;
 import com.sitewhere.rest.client.SiteWhereClient;
+import com.sitewhere.rest.model.asset.Asset;
 import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
 import com.sitewhere.rest.model.device.event.DeviceEventBatch;
@@ -29,8 +30,8 @@ import com.sitewhere.rest.model.device.request.DeviceAssignmentCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceCreateRequest;
 import com.sitewhere.rest.model.device.request.DeviceSpecificationCreateRequest;
 import com.sitewhere.rest.model.device.request.SiteCreateRequest;
+import com.sitewhere.rest.model.search.AssetSearchResults;
 import com.sitewhere.rest.model.search.DeviceAssignmentSearchResults;
-import com.sitewhere.rest.model.search.SearchResults;
 import com.sitewhere.spi.ISiteWhereClient;
 import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.SiteWhereSystemException;
@@ -220,12 +221,18 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 */
 		protected void loadAssets() throws SiteWhereException {
 			// List all tracker assets.
-			SearchResults<HardwareAsset> trackers = client.getAssetsByModuleId(ASSET_MODULE_TRACKERS, null);
-			trackerAssets = trackers.getResults();
+			AssetSearchResults trackers = client.getAssetsByModuleId(ASSET_MODULE_TRACKERS, null);
+			trackerAssets = new ArrayList<HardwareAsset>();
+			for (Asset asset : trackers.getResults()) {
+				trackerAssets.add((HardwareAsset) asset);
+			}
 
 			// List all plane assets.
-			SearchResults<HardwareAsset> planes = client.getAssetsByModuleId(ASSET_MODULE_PLANES, null);
-			planeAssets = planes.getResults();
+			AssetSearchResults planes = client.getAssetsByModuleId(ASSET_MODULE_PLANES, null);
+			planeAssets = new ArrayList<HardwareAsset>();
+			for (Asset asset : planes.getResults()) {
+				planeAssets.add((HardwareAsset) asset);
+			}
 		}
 
 		/**
