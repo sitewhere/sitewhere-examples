@@ -9,7 +9,7 @@ package com.sitewhere.examples.socket.complex;
 
 import org.apache.log4j.Logger;
 
-import com.sitewhere.server.lifecycle.LifecycleComponent;
+import com.sitewhere.server.lifecycle.TenantLifecycleComponent;
 import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.device.IDeviceAssignment;
 import com.sitewhere.spi.device.IDeviceNestingContext;
@@ -24,7 +24,8 @@ import com.sitewhere.spi.server.lifecycle.LifecycleComponentType;
  * 
  * @author Derek
  */
-public class LaipacCommandEncoder extends LifecycleComponent implements ICommandExecutionEncoder<String> {
+public class LaipacCommandEncoder extends TenantLifecycleComponent implements
+		ICommandExecutionEncoder<String> {
 
 	/** Static logger instance */
 	private static Logger LOGGER = Logger.getLogger(LaipacCommandEncoder.class);
