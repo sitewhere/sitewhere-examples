@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<properties>
+		<sitewhere.version>1.4.0</sitewhere.version>
+	</properties>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.sitewhere.examples</groupId>
+	<artifactId>spark-simple</artifactId>
+	<version>${sitewhere.version}</version>
+	<packaging>jar</packaging>
+	<name>SiteWhere / Apache Spark Simple Example</name>
+	<url>http://www.sitewhere.com</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sitewhere</groupId>
+			<artifactId>sitewhere-spark</artifactId>
+			<version>${sitewhere.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-streaming_2.10</artifactId>
+			<version>1.5.2</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
