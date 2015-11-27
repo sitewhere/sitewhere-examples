@@ -511,6 +511,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 			metadata.put("departure", route.getDeparture().name());
 			metadata.put("destination", route.getDestination().name());
 			location.setMetadata(metadata);
+			location.setUpdateState(true);
 			batch.getLocations().add(location);
 
 			// Create request for new device measurements event.
@@ -519,6 +520,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 			request.addOrReplaceMeasurement("fuel.level", flight.getFuelLevel());
 			request.addOrReplaceMeasurement("air.speed", flight.getAirspeed());
 			request.addOrReplaceMeasurement("heading", flight.getHeading());
+			request.setUpdateState(true);
 			batch.getMeasurements().add(request);
 
 			return batch;
