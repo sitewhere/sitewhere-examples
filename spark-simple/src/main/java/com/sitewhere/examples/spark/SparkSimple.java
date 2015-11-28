@@ -29,7 +29,7 @@ import com.sitewhere.spi.device.event.IDeviceEvent;
 public class SparkSimple {
 
 	/** Address Hazelcast client will use for connection */
-	public static final String HAZELCAST_ADDRESS = "localhost:5701";
+	public static final String HAZELCAST_ADDRESS = "127.0.0.1:5701";
 
 	/** Hazelcast group name */
 	public static final String HAZELCAST_USERNAME = "sitewhere";
@@ -42,12 +42,17 @@ public class SparkSimple {
 
 	@SuppressWarnings("serial")
 	public static void main(String[] args) {
-		SparkConf conf = new SparkConf().setMaster("local[2]").setAppName("SparkSimple");
+		String hazelcast = HAZELCAST_ADDRESS;
+		if (args.length > 0) {
+			hazelcast = args[0];
+		}
+
+		SparkConf conf = new SparkConf().setMaster("local[4]").setAppName("SparkSimple");
 		JavaStreamingContext context = null;
 		try {
-			context = new JavaStreamingContext(conf, Durations.seconds(1));
+			context = new JavaStreamingContext(conf, Durations.minutes(1));
 			JavaReceiverInputDStream<IDeviceEvent> sitewhere =
-					context.receiverStream(new SiteWhereReceiver(HAZELCAST_ADDRESS, HAZELCAST_USERNAME,
+					context.receiverStream(new SiteWhereReceiver(hazelcast, HAZELCAST_USERNAME,
 							HAZELCAST_PASSWORD, TENANT_ID));
 			JavaPairDStream<String, Integer> pairs =
 					sitewhere.mapToPair(new PairFunction<IDeviceEvent, String, Integer>() {
@@ -64,6 +69,8 @@ public class SparkSimple {
 						}
 					});
 			assignmentCounts.print();
+			context.start();
+			context.awaitTermination();
 		} finally {
 			if (context != null) {
 				context.close();
