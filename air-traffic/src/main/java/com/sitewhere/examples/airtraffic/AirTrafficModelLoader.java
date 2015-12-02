@@ -21,8 +21,8 @@ import com.sitewhere.examples.airtraffic.rest.model.Flight;
 import com.sitewhere.examples.airtraffic.rest.model.MarshaledRoute;
 import com.sitewhere.rest.client.SiteWhereClient;
 import com.sitewhere.rest.model.asset.Asset;
-import com.sitewhere.rest.model.asset.HardwareAsset;
 import com.sitewhere.rest.model.device.DeviceAssignment;
+import com.sitewhere.rest.model.device.SiteMapData;
 import com.sitewhere.rest.model.device.event.DeviceEventBatch;
 import com.sitewhere.rest.model.device.event.request.DeviceLocationCreateRequest;
 import com.sitewhere.rest.model.device.event.request.DeviceMeasurementsCreateRequest;
@@ -91,10 +91,10 @@ public class AirTrafficModelLoader extends HttpServlet {
 	private ISite site;
 
 	/** Tracker assets */
-	private List<HardwareAsset> trackerAssets;
+	private List<Asset> trackerAssets;
 
 	/** Plane assets */
-	private List<HardwareAsset> planeAssets;
+	private List<Asset> planeAssets;
 
 	/** Device specifications */
 	private List<IDeviceSpecification> specifications;
@@ -166,8 +166,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 				try {
 					client.getSiteWhereVersion();
 					return true;
-				} catch (SiteWhereException e) {
-					LOGGER.info("Waiting on SiteWhere REST services to become available.");
+				} catch (Throwable e) {
+					LOGGER.info("Waiting on SiteWhere REST services to become available.", e);
 				}
 				try {
 					Thread.sleep(5000);
@@ -206,10 +206,12 @@ public class AirTrafficModelLoader extends HttpServlet {
 					+ "The system tracks many plane assets that have associated monitoring devices which "
 					+ "send events for plane locations and various other KPIs.");
 			create.setImageUrl("https://s3.amazonaws.com/sitewhere-demo/airport/airport.gif");
-			create.getMap().setType("mapquest");
-			create.getMap().addOrReplaceMetadata(ISiteMapMetadata.MAP_CENTER_LATITUDE, "39.798122");
-			create.getMap().addOrReplaceMetadata(ISiteMapMetadata.MAP_CENTER_LONGITUDE, "-98.7223078");
-			create.getMap().addOrReplaceMetadata(ISiteMapMetadata.MAP_ZOOM_LEVEL, "5");
+			SiteMapData map = new SiteMapData();
+			map.setType("mapquest");
+			map.addOrReplaceMetadata(ISiteMapMetadata.MAP_CENTER_LATITUDE, "39.798122");
+			map.addOrReplaceMetadata(ISiteMapMetadata.MAP_CENTER_LONGITUDE, "-98.7223078");
+			map.addOrReplaceMetadata(ISiteMapMetadata.MAP_ZOOM_LEVEL, "5");
+			create.setMap(map);
 			LOGGER.info("Creating new air traffic site.");
 			return client.createSite(create);
 		}
@@ -222,17 +224,11 @@ public class AirTrafficModelLoader extends HttpServlet {
 		protected void loadAssets() throws SiteWhereException {
 			// List all tracker assets.
 			AssetSearchResults trackers = client.getAssetsByModuleId(ASSET_MODULE_TRACKERS, null);
-			trackerAssets = new ArrayList<HardwareAsset>();
-			for (Asset asset : trackers.getResults()) {
-				trackerAssets.add((HardwareAsset) asset);
-			}
+			trackerAssets = trackers.getResults();
 
 			// List all plane assets.
 			AssetSearchResults planes = client.getAssetsByModuleId(ASSET_MODULE_PLANES, null);
-			planeAssets = new ArrayList<HardwareAsset>();
-			for (Asset asset : planes.getResults()) {
-				planeAssets.add((HardwareAsset) asset);
-			}
+			planeAssets = planes.getResults();
 		}
 
 		/**
@@ -243,7 +239,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 */
 		protected List<IDeviceSpecification> createDeviceSpecifications() throws SiteWhereException {
 			List<IDeviceSpecification> specifications = new ArrayList<IDeviceSpecification>();
-			for (HardwareAsset asset : trackerAssets) {
+			for (Asset asset : trackerAssets) {
 				DeviceSpecificationCreateRequest create = new DeviceSpecificationCreateRequest();
 				create.setAssetId(asset.getId());
 				create.setAssetModuleId(ASSET_MODULE_TRACKERS);
@@ -293,7 +289,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * 
 		 * @return
 		 */
-		protected HardwareAsset getRandomPlaneAsset() {
+		protected Asset getRandomPlaneAsset() {
 			int count = planeAssets.size();
 			int slot = (int) Math.floor(Math.random() * count);
 			return planeAssets.get(slot);
@@ -308,7 +304,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 		protected List<IDeviceAssignment> createDeviceAssignments() throws SiteWhereException {
 			List<IDeviceAssignment> assignments = new ArrayList<IDeviceAssignment>();
 			for (IDevice device : devices) {
-				HardwareAsset plane = getRandomPlaneAsset();
+				Asset plane = getRandomPlaneAsset();
 				DeviceAssignmentCreateRequest create = new DeviceAssignmentCreateRequest();
 				create.setAssetId(plane.getId());
 				create.setAssetModuleId(ASSET_MODULE_PLANES);

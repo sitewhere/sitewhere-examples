@@ -305,7 +305,8 @@ body {
 			'type' : 'GET',
 			'url' : "/sitewhere/api/assignments/" + token,
 			'headers' : {
-				"Authorization" : "Basic " + btoa("admin:password")
+				"Authorization" : "Basic " + btoa("admin:password"),
+				"X-SiteWhere-Tenant" : "sitewhere1234567890"
 			},
 			'contentType' : 'application/json',
 			'success' : onAssignmentSuccess,
@@ -315,7 +316,8 @@ body {
 			'type' : 'GET',
 			'url' : "/sitewhere/api/assignments/" + token + "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
 			'headers' : {
-				"Authorization" : "Basic " + btoa("admin:password")
+				"Authorization" : "Basic " + btoa("admin:password"),
+				"X-SiteWhere-Tenant" : "sitewhere1234567890"
 			},
 			'contentType' : 'application/json',
 			'success' : onGraphDataSuccess,
