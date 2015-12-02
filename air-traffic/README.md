@@ -1,9 +1,9 @@
 ![SiteWhere] (https://s3.amazonaws.com/sitewhere-demo/sitewhere-small.png)
 
 # SiteWhere Air Traffic Control Example
-This example project features a web application that display a map with
+This example project features a web application that displays a map with
 many planes being tracked based on simulated data being generated into 
-SiteWhere. It shows many key SiteWhere features including use of device
+SiteWhere. It shows many key SiteWhere features including the use of device
 management and asset managment capabilities via REST services, ingestion
 of data via the Stomp protocol, and visualization of data in real-time.
 
@@ -62,4 +62,6 @@ plane (x30 planes) per second for a total of 60 events per second.
 The air traffic example includes a user interface with a map of the United States with plane
 icons superimposed to indicate the current position and direction. The color of the plane
 icon also indicates the current fuel level -- progressing from green to red as the level 
-decreases.
+decreases. The user interface for the example can be accessed from the following URL:
+
+> http://localhost:8080/airtraffic
