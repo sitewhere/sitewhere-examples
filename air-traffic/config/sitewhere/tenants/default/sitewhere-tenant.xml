@@ -36,6 +36,12 @@
 			<!-- Default MongoDB Datastore -->
 			<sw:mongo-tenant-datastore useBulkEventInserts="true"
 				bulkInsertMaxChunkSize="1000"/>
+
+			<!-- Hybrid MongoDB/InfluxDB Datastore -->
+			<!--  
+			<sw:mongo-influxdb-tenant-datastore connectUrl="http://localhost:8086"
+				logLevel="basic" enableBatch="true" batchChunkSize="1000" batchIntervalMs="100"/>
+			-->
 		
 			<!-- Default HBase Datastore -->
 			<!--  
@@ -59,7 +65,7 @@
 		
 			<!-- Inbound event sources -->
 			<sw:event-sources>
-
+			
 				<!-- Event source for Stomp messages over ActiveMQ queue (for air traffic example) -->
 				<sw:activemq-event-source sourceId="stomp"
 					transportUri="stomp://localhost:2345?trace=true" queueName="SITEWHERE.STOMP"
@@ -67,18 +73,37 @@
 					<sw:json-event-decoder/>
 				</sw:activemq-event-source>
 
+
+				<!-- Event source for protobuf messages over MQTT -->
+				<sw:mqtt-event-source sourceId="protobuf" hostname="localhost"
+					port="1883" topic="SiteWhere/input/protobuf">
+					<sw:protobuf-event-decoder/>
+				</sw:mqtt-event-source>
+
+				<!-- Event source for JSON messages over MQTT -->
+				<sw:mqtt-event-source sourceId="json" hostname="localhost" port="1883"
+					topic="SiteWhere/input/jsonbatch">
+					<sw:json-event-decoder/>
+				</sw:mqtt-event-source>
+
 			</sw:event-sources>
-		
-			<!-- Inbound Processing Strategy -->
-			<sw:inbound-processing-strategy>
-				<sw:default-inbound-processing-strategy
-					numEventProcessorThreads="10" enableMonitoring="false" monitoringIntervalSec="3"/>
-			</sw:inbound-processing-strategy>
 			
-			<!-- Device registration -->
-			<sw:registration>
+			<!-- Device services -->
+			<sw:device-services>
+
+				<!-- Configure registration options -->
 				<sw:default-registration-manager allowNewDevices="true"/>
-			</sw:registration>
+				
+				<!-- Configures symbol generation -->
+				<sw:symbol-generator-manager>
+				
+					<!-- Generate QR Codes -->
+					<sw:qr-code-symbol-generator id="qrcode" name="Basic QR Code"
+						width="250" height="250" backgroundColor="FFFFFFFF" foregroundColor="FF111111"/>
+
+				</sw:symbol-generator-manager>
+
+			</sw:device-services>
 			
 			<!-- Batch operation management -->
 			<sw:batch-operations>
@@ -121,40 +146,56 @@
 
 		</sw:device-communication>
 		
-		<!-- ############################ -->
-		<!-- # INBOUND PROCESSING CHAIN # -->
-		<!-- ############################ -->
-		<sw:inbound-processing-chain>
-			
-			<!-- Store events -->
-			<sw:event-storage-processor/>
-			
-			<!-- Allow devices to dynamically register -->
-			<sw:registration-processor/>
-			
-			<!-- Allow devices to create streams and send stream data -->
-			<sw:device-stream-processor/>
+		<!-- #################### -->
+		<!-- # EVENT PROCESSING # -->
+		<!-- #################### -->
+		<sw:event-processing>
+		
+			<!-- Inbound Processing Strategy -->
+			<sw:inbound-processing-strategy>
+				<sw:blocking-queue-inbound-processing-strategy
+					maxQueueSize="10000" numEventProcessorThreads="10" enableMonitoring="false"
+					monitoringIntervalSec="3"/>
+			</sw:inbound-processing-strategy>
 
-		</sw:inbound-processing-chain>
-		
-		<!-- ############################# -->
-		<!-- # OUTBOUND PROCESSING CHAIN # -->
-		<!-- ############################# -->
-		<sw:outbound-processing-chain>
-		
-			<!-- Routes commands for outbound processing -->
-			<sw:command-delivery-event-processor/>
+			<!-- Inbound Processing Chain -->
+			<sw:inbound-processing-chain>
 			
-			<!-- Send outbound device events over Hazelcast -->
-			<sw:hazelcast-event-processor/>
+				<!-- Store events -->
+				<sw:event-storage-processor/>
+			
+				<!-- Allow devices to dynamically register -->
+				<sw:registration-processor/>
+			
+				<!-- Allow devices to create streams and send stream data -->
+				<sw:device-stream-processor/>
 
-		</sw:outbound-processing-chain>
+			</sw:inbound-processing-chain>
+
+			<!-- Outbound Processing Strategy -->
+			<sw:outbound-processing-strategy>
+				<sw:blocking-queue-outbound-processing-strategy
+					maxQueueSize="10000" numEventProcessorThreads="10"/>
+			</sw:outbound-processing-strategy>
+			
+			<!-- Outbound Processing Chain -->
+			<sw:outbound-processing-chain>
 		
+				<!-- Routes commands for outbound processing -->
+				<sw:command-delivery-event-processor/>
+			
+				<!-- Send outbound device events over Hazelcast -->
+				<sw:hazelcast-event-processor/>
+
+			</sw:outbound-processing-chain>
+
+		</sw:event-processing>
+				
 		<!-- #################### -->
 		<!-- # ASSET MANAGEMENT # -->
 		<!-- #################### -->
 		<sw:asset-management>
-
+		
 			<!-- Additional asset types for air traffic -->
 			<sw:filesystem-device-asset-module filename="airtraffic-devices.xml"
 				moduleId="at-devices" moduleName="Air Traffic Devices"/>

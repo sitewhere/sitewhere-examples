@@ -76,7 +76,10 @@ public class AirTrafficModelLoader extends HttpServlet {
 	private static final int PLANE_COUNT = 30;
 
 	/** Number of steps in route */
-	private static final int NUM_STEPS = 50;
+	private static final int NUM_STEPS = 40;
+
+	/** Number of milliseconds to wait between steps */
+	private static final int STEP_WAIT_SEC = 2;
 
 	/** Mapper used for marshaling event create requests */
 	private static ObjectMapper MAPPER = new ObjectMapper();
@@ -397,7 +400,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 
 					AirTraffic.getInstance().setFlights(flights);
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(STEP_WAIT_SEC * 1000);
 					} catch (InterruptedException e) {
 						return;
 					}
