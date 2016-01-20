@@ -331,85 +331,95 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * 
 		 * @throws SiteWhereException
 		 */
-		protected void generateEventData() throws SiteWhereException {
+		protected void generateEventData() {
 			Map<String, Route> routes = new HashMap<String, Route>();
 			while (true) {
-				DeviceAssignmentSearchResults results = client.listAssignmentsForSite(site.getToken());
-				List<DeviceAssignment> assignments = results.getResults();
-
-				// Create routes for all assignments.
-				for (DeviceAssignment assignment : assignments) {
-					Route existing = routes.get(assignment.getToken());
-					Route route =
-							(existing != null) ? Route.startingWith(existing.getDestination())
-									: Route.random();
-					routes.put(assignment.getToken(), route);
-				}
-
-				StompConnection connection = new StompConnection();
 				try {
-					connection.open("localhost", 2345);
-					connection.connect("system", "manager");
-				} catch (Exception e) {
-					throw new SiteWhereException("Unable to connect to Stomp server.", e);
-				}
+					DeviceAssignmentSearchResults results = client.listAssignmentsForSite(site.getToken());
+					List<DeviceAssignment> assignments = results.getResults();
 
-				// Step through routes and calculate current position.
-				for (int i = 0; i < NUM_STEPS; i++) {
-					List<Flight> flights = new ArrayList<Flight>();
+					// Create routes for all assignments.
+					for (DeviceAssignment assignment : assignments) {
+						Route existing = routes.get(assignment.getToken());
+						Route route =
+								(existing != null) ? Route.startingWith(existing.getDestination())
+										: Route.random();
+						routes.put(assignment.getToken(), route);
+					}
 
+					StompConnection connection = new StompConnection();
 					try {
-						connection.begin("tx1");
+						connection.open("localhost", 2345);
+						connection.connect("system", "manager");
 					} catch (Exception e) {
 						throw new SiteWhereException("Unable to connect to Stomp server.", e);
 					}
 
-					for (DeviceAssignment assignment : assignments) {
-						Route route = routes.get(assignment.getToken());
-						double slat = route.getDeparture().getLatitude();
-						double elat = route.getDestination().getLatitude();
-						double slon = route.getDeparture().getLongitude();
-						double elon = route.getDestination().getLongitude();
-						double latDelta = (elat - slat) / (double) NUM_STEPS;
-						double lonDelta = (elon - slon) / (double) NUM_STEPS;
-						double lat = route.getDeparture().getLatitude() + (i * latDelta);
-						double lon = route.getDeparture().getLongitude() + (i * lonDelta);
-						double heading = (270 - Math.atan2(slat - elat, slon - elon) * 180 / Math.PI) % 360;
-						double elevation =
-								Math.sin(i / (double) NUM_STEPS * Math.PI)
-										* (10000.0 + route.getAltitudeMultiplier() * 1000);
-						double fuelLevel =
-								1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330)
-										+ (Math.random() * 30.0) - 15.0;
-						double airspeed =
-								200.0 + (Math.sin(i / (double) NUM_STEPS * Math.PI) * 250.0)
-										+ (Math.random() * 80.0) - 40.0;
+					// Step through routes and calculate current position.
+					for (int i = 0; i < NUM_STEPS; i++) {
+						List<Flight> flights = new ArrayList<Flight>();
 
-						Flight flight =
-								createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel,
-										airspeed);
-						sendEvents(connection, assignment, route, flight);
-						flights.add(flight);
+						try {
+							connection.begin("tx1");
+						} catch (Exception e) {
+							throw new SiteWhereException("Unable to connect to Stomp server.", e);
+						}
+
+						for (DeviceAssignment assignment : assignments) {
+							Route route = routes.get(assignment.getToken());
+							double slat = route.getDeparture().getLatitude();
+							double elat = route.getDestination().getLatitude();
+							double slon = route.getDeparture().getLongitude();
+							double elon = route.getDestination().getLongitude();
+							double latDelta = (elat - slat) / (double) NUM_STEPS;
+							double lonDelta = (elon - slon) / (double) NUM_STEPS;
+							double lat = route.getDeparture().getLatitude() + (i * latDelta);
+							double lon = route.getDeparture().getLongitude() + (i * lonDelta);
+							double heading =
+									(270 - Math.atan2(slat - elat, slon - elon) * 180 / Math.PI) % 360;
+							double elevation =
+									Math.sin(i / (double) NUM_STEPS * Math.PI)
+											* (10000.0 + route.getAltitudeMultiplier() * 1000);
+							double fuelLevel =
+									1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330)
+											+ (Math.random() * 30.0) - 15.0;
+							double airspeed =
+									200.0 + (Math.sin(i / (double) NUM_STEPS * Math.PI) * 250.0)
+											+ (Math.random() * 80.0) - 40.0;
+
+							Flight flight =
+									createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel,
+											airspeed);
+							sendEvents(connection, assignment, route, flight);
+							flights.add(flight);
+						}
+
+						try {
+							connection.commit("tx1");
+						} catch (Exception e) {
+							throw new SiteWhereException("Unable to commit data on Stomp connection.", e);
+						}
+
+						AirTraffic.getInstance().setFlights(flights);
+						try {
+							Thread.sleep(STEP_WAIT_SEC * 1000);
+						} catch (InterruptedException e) {
+							return;
+						}
 					}
 
 					try {
-						connection.commit("tx1");
+						connection.disconnect();
 					} catch (Exception e) {
 						throw new SiteWhereException("Unable to commit data on Stomp connection.", e);
 					}
-
-					AirTraffic.getInstance().setFlights(flights);
+				} catch (SiteWhereException e) {
+					LOGGER.info("Stomp endpoint not available.");
 					try {
-						Thread.sleep(STEP_WAIT_SEC * 1000);
-					} catch (InterruptedException e) {
+						Thread.sleep(STEP_WAIT_SEC * 4 * 1000);
+					} catch (InterruptedException ie) {
 						return;
 					}
-				}
-
-				try {
-					connection.disconnect();
-				} catch (Exception e) {
-					throw new SiteWhereException("Unable to commit data on Stomp connection.", e);
 				}
 			}
 		}
