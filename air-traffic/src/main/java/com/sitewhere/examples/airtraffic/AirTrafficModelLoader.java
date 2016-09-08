@@ -13,7 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.activemq.transport.stomp.StompConnection;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,10 +46,10 @@ import com.sitewhere.spi.device.ISiteMapMetadata;
 import com.sitewhere.spi.error.ErrorCode;
 
 /**
- * Loads model for the air traffic example. Creates a site and devices used to track
- * planes in route between major cities in the United States. Once the model is loaded, a
- * thread constantly generates location and measurements event data for the planes to
- * simulate a live monitoring scenario.
+ * Loads model for the air traffic example. Creates a site and devices used to
+ * track planes in route between major cities in the United States. Once the
+ * model is loaded, a thread constantly generates location and measurements
+ * event data for the planes to simulate a live monitoring scenario.
  * 
  * @author Derek
  */
@@ -58,7 +59,7 @@ public class AirTrafficModelLoader extends HttpServlet {
 	private static final long serialVersionUID = 2497075428217483256L;
 
 	/** Static logger instance */
-	private static Logger LOGGER = Logger.getLogger(AirTrafficModelLoader.class);
+	private static Logger LOGGER = LogManager.getLogger();
 
 	/** Asset module id for tracker assets */
 	private static final String ASSET_MODULE_TRACKERS = "at-devices";
@@ -129,8 +130,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 	}
 
 	/**
-	 * Populates data model then generates sample data for many planes moving between
-	 * destinations.
+	 * Populates data model then generates sample data for many planes moving
+	 * between destinations.
 	 * 
 	 * @author Derek
 	 */
@@ -146,11 +147,12 @@ public class AirTrafficModelLoader extends HttpServlet {
 				} catch (SiteWhereException e) {
 					if (e instanceof SiteWhereSystemException) {
 						if (((SiteWhereSystemException) e).getCode() == ErrorCode.InvalidSiteToken) {
+							LOGGER.info("Site was not present. Creating air traffic model on SiteWhere instance...");
 							try {
 								createModel();
 								generateEventData();
 							} catch (SiteWhereException e1) {
-								LOGGER.error("Error loading air traffic data model.", e);
+								LOGGER.error("Error loading air traffic data model.", e1);
 							}
 							return;
 						}
@@ -161,8 +163,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 		}
 
 		/**
-		 * Wait indefinitely for SiteWhere to become available. Attempts to ping the
-		 * server every five seconds until it gets a response.
+		 * Wait indefinitely for SiteWhere to become available. Attempts to ping
+		 * the server every five seconds until it gets a response.
 		 */
 		protected boolean waitForSiteWhereToStart() {
 			while (true) {
@@ -225,13 +227,23 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @throws SiteWhereException
 		 */
 		protected void loadAssets() throws SiteWhereException {
-			// List all tracker assets.
-			AssetSearchResults trackers = client.getAssetsByModuleId(ASSET_MODULE_TRACKERS, null);
-			trackerAssets = trackers.getResults();
+			try {
+				// List all tracker assets.
+				AssetSearchResults trackers = client.getAssetsByModuleId(ASSET_MODULE_TRACKERS, null);
+				trackerAssets = trackers.getResults();
+			} catch (SiteWhereException e) {
+				throw new SiteWhereException(
+						"Unable to create model. Verify that air traffic devices asset module has been loaded.");
+			}
 
-			// List all plane assets.
-			AssetSearchResults planes = client.getAssetsByModuleId(ASSET_MODULE_PLANES, null);
-			planeAssets = planes.getResults();
+			try {
+				// List all plane assets.
+				AssetSearchResults planes = client.getAssetsByModuleId(ASSET_MODULE_PLANES, null);
+				planeAssets = planes.getResults();
+			} catch (SiteWhereException e) {
+				throw new SiteWhereException(
+						"Unable to create model. Verify that air traffic planes asset module has been loaded.");
+			}
 		}
 
 		/**
@@ -326,8 +338,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 		}
 
 		/**
-		 * Generate event data by repeatedly creating routes and moving planes along them
-		 * while reporting location and other KPIs via Stomp.
+		 * Generate event data by repeatedly creating routes and moving planes
+		 * along them while reporting location and other KPIs via Stomp.
 		 * 
 		 * @throws SiteWhereException
 		 */
@@ -341,9 +353,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 					// Create routes for all assignments.
 					for (DeviceAssignment assignment : assignments) {
 						Route existing = routes.get(assignment.getToken());
-						Route route =
-								(existing != null) ? Route.startingWith(existing.getDestination())
-										: Route.random();
+						Route route = (existing != null) ? Route.startingWith(existing.getDestination())
+								: Route.random();
 						routes.put(assignment.getToken(), route);
 					}
 
@@ -375,21 +386,16 @@ public class AirTrafficModelLoader extends HttpServlet {
 							double lonDelta = (elon - slon) / (double) NUM_STEPS;
 							double lat = route.getDeparture().getLatitude() + (i * latDelta);
 							double lon = route.getDeparture().getLongitude() + (i * lonDelta);
-							double heading =
-									(270 - Math.atan2(slat - elat, slon - elon) * 180 / Math.PI) % 360;
-							double elevation =
-									Math.sin(i / (double) NUM_STEPS * Math.PI)
-											* (10000.0 + route.getAltitudeMultiplier() * 1000);
-							double fuelLevel =
-									1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330)
-											+ (Math.random() * 30.0) - 15.0;
-							double airspeed =
-									200.0 + (Math.sin(i / (double) NUM_STEPS * Math.PI) * 250.0)
-											+ (Math.random() * 80.0) - 40.0;
+							double heading = (270 - Math.atan2(slat - elat, slon - elon) * 180 / Math.PI) % 360;
+							double elevation = Math.sin(i / (double) NUM_STEPS * Math.PI)
+									* (10000.0 + route.getAltitudeMultiplier() * 1000);
+							double fuelLevel = 1000 - (i / (double) NUM_STEPS * route.getFuelMultiplier() * 330)
+									+ (Math.random() * 30.0) - 15.0;
+							double airspeed = 200.0 + (Math.sin(i / (double) NUM_STEPS * Math.PI) * 250.0)
+									+ (Math.random() * 80.0) - 40.0;
 
-							Flight flight =
-									createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel,
-											airspeed);
+							Flight flight = createFlight(assignment, route, lat, lon, elevation, heading, fuelLevel,
+									airspeed);
 							sendEvents(connection, assignment, route, flight);
 							flights.add(flight);
 						}
@@ -473,8 +479,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @param flight
 		 * @throws SiteWhereException
 		 */
-		protected void sendEvents(StompConnection connection, DeviceAssignment assignment, Route route,
-				Flight flight) throws SiteWhereException {
+		protected void sendEvents(StompConnection connection, DeviceAssignment assignment, Route route, Flight flight)
+				throws SiteWhereException {
 
 			boolean useStomp = true;
 			DeviceEventBatch batch = createDeviceEventBatch(assignment, route, flight);
@@ -505,8 +511,8 @@ public class AirTrafficModelLoader extends HttpServlet {
 		 * @return
 		 * @throws SiteWhereException
 		 */
-		protected DeviceEventBatch createDeviceEventBatch(DeviceAssignment assignment, Route route,
-				Flight flight) throws SiteWhereException {
+		protected DeviceEventBatch createDeviceEventBatch(DeviceAssignment assignment, Route route, Flight flight)
+				throws SiteWhereException {
 			DeviceEventBatch batch = new DeviceEventBatch();
 			batch.setHardwareId(assignment.getDevice().getHardwareId());
 

@@ -19,6 +19,31 @@ Using a Git client, clone the SiteWhere examples project using the command:
 
 > git clone https://github.com/sitewhere/sitewhere-examples.git
 
+## Prepare SiteWhere Instance
+Before running the example, the SiteWhere instance should be configured with the
+assets expected by the air traffic domain as well as an event source to accept
+STOMP data from the external application.
+
+### Add Asset Modules
+Start by creating a new **assets** folder in the SiteWhere **conf** folder. Copy the
+asset XML files from the example project (in the **config/assets** folder) into the
+newly created folder in the SiteWhere instance.
+
+Open the tenant configuration editor for the default tenant and choose to **XML Device Asset Module** from
+the dropdown.
+
+![Add a Device Asset Module](/images/add_asset_module.png)
+
+Fill in the details to point to the XML file copied earlier as shown below:
+
+![Adding Air Traffic Device Assets](/images/at-devices.png)
+
+Next, add an **XML Hardware Asset Module** and fill in the details to point to the XML file
+containing plane assets as shown below:
+
+![Adding Air Traffic Hardware Assets](/images/at-planes.png)
+
+## Start Air Traffic Example
 Navigate to the **air-traffic** folder and execute:
 
 > mvn clean install
@@ -38,11 +63,6 @@ Two new asset modules have been added for the tracker and plane assets.
 * **assets/airtraffic-*.xml** - These are XML files that contain asset definitions
 used in the air traffic example. SiteWhere allows assets to be defined in the database,
 externally in asset management systems, or locally in XML files.
-
-## Start SiteWhere
-To see the application in action, start the SiteWhere instance. If this is the first
-time SiteWhere is booting, it will automatically populate sample data for the user
-model and other aspects of the system.
 
 ### Air Traffic Example Boot Process
 After SiteWhere is started, the air traffic example application loads its model

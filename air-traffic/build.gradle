@@ -17,7 +17,13 @@ allprojects {
 	    contextPath = 'airtraffic'
 	}
 	
+	repositories {
+        maven { url "http://repo.maven.apache.org/maven2" }
+        maven { url "https://jitpack.io" }
+ 	}
+	
     dependencies {
+		compile(group: 'com.sitewhere', name: 'sitewhere-core', version: '1.8.0')
 		compile(group: 'com.sitewhere', name: 'sitewhere-client', version: '1.8.0')
 		compile(group: 'org.springframework', name: 'spring-web')
 		compile(group: 'org.springframework', name: 'spring-webmvc')
