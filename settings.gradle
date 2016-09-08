@@ -1,0 +1,4 @@
+rootProject.name = 'sitewhere-examples'
+include ':air-traffic'
+
+project(':air-traffic').projectDir = "$rootDir/air-traffic" as File

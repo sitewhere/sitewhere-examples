@@ -2,15 +2,24 @@
 <html>
 <head>
 <title>Air Traffic Example</title>
-<script src="${pageContext.request.contextPath}/scripts/jquery-1.10.2.min.js"></script>
-<script src="${pageContext.request.contextPath}/scripts/kendo.web.min.js"></script>
-<script src="${pageContext.request.contextPath}/scripts/kendo.dataviz.min.js"></script>
-<script src="${pageContext.request.contextPath}/scripts/bootstrap.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<link href="${pageContext.request.contextPath}/css/kendo.common.min.css" rel="stylesheet" />
-<link href="${pageContext.request.contextPath}/css/kendo.bootstrap.min.css" rel="stylesheet" />
-<link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"
-	media="screen">
+<script
+	src="${pageContext.request.contextPath}/scripts/jquery-1.10.2.min.js"></script>
+<script
+	src="${pageContext.request.contextPath}/scripts/kendo.web.min.js"></script>
+<script
+	src="${pageContext.request.contextPath}/scripts/kendo.dataviz.min.js"></script>
+<script
+	src="${pageContext.request.contextPath}/scripts/bootstrap.min.js"></script>
+<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs-iiPg7Pu5o_bBmduqYueBWiTauo7i7w&sensor=false&callback=initializeMap"
+	type="text/javascript"></script>
+<link href="${pageContext.request.contextPath}/css/kendo.common.min.css"
+	rel="stylesheet" />
+<link
+	href="${pageContext.request.contextPath}/css/kendo.bootstrap.min.css"
+	rel="stylesheet" />
+<link href="${pageContext.request.contextPath}/css/bootstrap.min.css"
+	rel="stylesheet" media="screen">
 </head>
 
 <style>
@@ -145,7 +154,9 @@ body {
 				<div id="fuel-level-graph" style="height: 240px;"></div>
 			</div>
 		</div>
-		<button type="button" style="position: absolute; top: 10px; right: 10px;" onclick="closePopup()">&times;</button>
+		<button type="button"
+			style="position: absolute; top: 10px; right: 10px;"
+			onclick="closePopup()">&times;</button>
 	</div>
 </body>
 
@@ -164,17 +175,18 @@ body {
 
 	/** Reference to tab panel */
 	var tabs;
-	
+
 	/** Air speed chart */
 	var airSpeedChart;
-	
+
 	/** Fuel level chart */
 	var fuelLevelChart;
-	
+
 	/** Assignment token for popup */
 	var popupToken;
 
-	$(document).ready(function() {
+	/** Initialize the map */
+	function initializeMap() {
 		var mapCenter = new google.maps.LatLng(39.2416975, -98.1939341);
 		var options = {
 			zoom : 5,
@@ -182,7 +194,9 @@ body {
 			mapTypeId : google.maps.MapTypeId.SATELLITE,
 		}
 		map = new google.maps.Map(document.getElementById("map"), options);
+	}
 
+	$(document).ready(function() {
 		/** Create the tab strip */
 		tabs = $("#tabs").kendoTabStrip({
 			animation : false,
@@ -199,7 +213,7 @@ body {
 				markers : {
 					visible : false
 				},
-				visibleInLegend: false,
+				visibleInLegend : false,
 			} ],
 		}).data("kendoChart");
 
@@ -214,7 +228,7 @@ body {
 				markers : {
 					visible : false
 				},
-				visibleInLegend: false,
+				visibleInLegend : false,
 			} ],
 		}).data("kendoChart");
 
@@ -223,15 +237,17 @@ body {
 
 	/** Load flight information from AJAX call */
 	function loadFlights() {
-		jQuery.ajax({
-			'type' : 'GET',
-			'url' : "${pageContext.request.contextPath}/api/flights",
-			'contentType' : 'application/json',
-			'success' : onFlightsSuccess,
-			'error' : onFlightsFail
-		});
-		if (popupToken) {
-			doShowAssignment(popupToken);
+		if (map) {
+			jQuery.ajax({
+				'type' : 'GET',
+				'url' : "${pageContext.request.contextPath}/api/flights",
+				'contentType' : 'application/json',
+				'success' : onFlightsSuccess,
+				'error' : onFlightsFail
+			});
+			if (popupToken) {
+				doShowAssignment(popupToken);
+			}
 		}
 	}
 
@@ -259,16 +275,15 @@ body {
 			existing.setPosition(new google.maps.LatLng(flight.latitude, flight.longitude));
 			existing.setIcon(symbol);
 		} else {
-			var plane =
-					{
-						path : 'M-2.934-22.215c0.006-3.686,5.562-3.686,5.558,0.103v15.467L24.277,6.37v5.714L2.728,4.992v11.56 l4.987,3.896v4.52l-7.688-2.39l-7.688,2.39v-4.52l4.936-3.896V4.992l-21.552,7.092V6.37L-2.934-6.645V-22.215z',
-						fillColor : getPlaneColor(flight.fuelLevel),
-						fillOpacity : 1,
-						rotation : 0,
-						scale : 1,
-						strokeColor : '#000',
-						strokeWeight : 2
-					};
+			var plane = {
+				path : 'M-2.934-22.215c0.006-3.686,5.562-3.686,5.558,0.103v15.467L24.277,6.37v5.714L2.728,4.992v11.56 l4.987,3.896v4.52l-7.688-2.39l-7.688,2.39v-4.52l4.936-3.896V4.992l-21.552,7.092V6.37L-2.934-6.645V-22.215z',
+				fillColor : getPlaneColor(flight.fuelLevel),
+				fillOpacity : 1,
+				rotation : 0,
+				scale : 1,
+				strokeColor : '#000',
+				strokeWeight : 2
+			};
 			var marker = new google.maps.Marker({
 				position : new google.maps.LatLng(flight.latitude, flight.longitude),
 				title : flight.planeModel,
@@ -314,7 +329,8 @@ body {
 		});
 		jQuery.ajax({
 			'type' : 'GET',
-			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token + "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
+			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token
+					+ "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
 			'headers' : {
 				"Authorization" : "Basic " + btoa("admin:password"),
 				"X-SiteWhere-Tenant" : "sitewhere1234567890"
@@ -349,7 +365,7 @@ body {
 
 	/** Called on successful chart data load request */
 	function onGraphDataSuccess(data, status, jqXHR) {
-		for (var i=0; i< data.length; i++) {
+		for (var i = 0; i < data.length; i++) {
 			if (data[i].measurementId == 'air.speed') {
 				airSpeedChart.options.series[0].data = convertChartData(data[i].entries);
 				airSpeedChart.refresh();
@@ -359,13 +375,16 @@ body {
 			}
 		}
 	}
-	
+
 	/** Convert chart data for use with KendoUI */
 	function convertChartData(entries) {
 		var result = [];
 		for (var i = 0; i < entries.length; i++) {
 			var date = kendo.parseDate(entries[i].measurementDate);
-			result.push({value: entries[i].value, date: date});
+			result.push({
+				value : entries[i].value,
+				date : date
+			});
 		}
 		return result;
 	}

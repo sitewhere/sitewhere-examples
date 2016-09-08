@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.5'
+    }
+}
+
+allprojects {
+
+	apply plugin: 'com.bmuschko.tomcat'
+	tomcat {
+	    httpPort = 8090
+	    ajpPort = 8109
+	    contextPath = 'airtraffic'
+	}
+	
+    dependencies {
+		compile(group: 'com.sitewhere', name: 'sitewhere-client', version: '1.8.0')
+		compile(group: 'org.springframework', name: 'spring-web')
+		compile(group: 'org.springframework', name: 'spring-webmvc')
+		compile(group: 'org.apache.activemq', name: 'activemq-all', version: '5.10.0')
+        compile(group: 'org.apache.logging.log4j', name: 'log4j-api')
+        compile(group: 'org.apache.logging.log4j', name: 'log4j-core')
+        compile(group: 'commons-logging', name: 'commons-logging')
+        
+		providedCompile 'javax.servlet:servlet-api:2.5', 'javax.servlet:jsp-api:2.0'
+                
+		def tomcatVersion = '7.0.59'
+		tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+        
+        testCompile group: 'junit', name: 'junit'
+    }
+}

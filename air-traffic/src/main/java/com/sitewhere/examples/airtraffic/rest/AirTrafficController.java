@@ -19,7 +19,7 @@ import com.sitewhere.examples.airtraffic.rest.model.Flight;
 import com.sitewhere.spi.SiteWhereException;
 
 /**
- * Controller for site operations.
+ * Controller for air traffic operations.
  * 
  * @author Derek Adams
  */
