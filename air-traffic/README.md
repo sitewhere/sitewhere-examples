@@ -43,6 +43,34 @@ containing plane assets as shown below:
 
 ![Adding Air Traffic Hardware Assets](images/at-planes.png)
 
+Click the **Stage Updates** button to commit the configuration changes. Stop the tenant engine, then
+restart it (using the power button in the banner) to apply the changes.
+
+### Add STOMP Event Source
+The air traffic application will be sending data via the STOMP protocol, so the SiteWhere instance
+should be configured with a corresponding event source.
+
+Open the tenant configuration editor for the default tenant, choose **Device Communication** > **Event Sources**,
+and choose to add a new **ActiveMQ Event Source** as shown below:
+
+![Adding STOMP Event Source](images/add_activemq.png)
+
+Fill in the details for the STOMP event source as shown below:
+
+![Adding STOMP Event Source](images/stomp_settings.png)
+
+Navigate into the STOMP event source by clicking on the green arrow beside it, then add a
+binary decoder which will parse the incoming STOMP messages. The air traffic application is
+using the standard SiteWhere JSON batch format, so choose **JSON Batch Event Decoder** as
+shown below:
+
+![Adding STOMP Event Source](images/add_decoder.png)
+
+Click the **Stage Updates** button to commit the configuration changes. Stop the tenant engine, then
+restart it (using the power button in the banner) to apply the changes.
+
+The SiteWhere instance is now configured to accept data from the air traffic example.
+
 ## Start Air Traffic Example
 Navigate to the **air-traffic** folder and execute:
 
