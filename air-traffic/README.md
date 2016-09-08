@@ -32,16 +32,16 @@ newly created folder in the SiteWhere instance.
 Open the tenant configuration editor for the default tenant and choose to **XML Device Asset Module** from
 the dropdown.
 
-![Add a Device Asset Module](/images/add_asset_module.png)
+![Add a Device Asset Module](images/add_asset_module.png)
 
 Fill in the details to point to the XML file copied earlier as shown below:
 
-![Adding Air Traffic Device Assets](/images/at-devices.png)
+![Adding Air Traffic Device Assets](images/at-devices.png)
 
 Next, add an **XML Hardware Asset Module** and fill in the details to point to the XML file
 containing plane assets as shown below:
 
-![Adding Air Traffic Hardware Assets](/images/at-planes.png)
+![Adding Air Traffic Hardware Assets](images/at-planes.png)
 
 ## Start Air Traffic Example
 Navigate to the **air-traffic** folder and execute:
