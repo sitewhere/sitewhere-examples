@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="air-traffic/src/main/java"/>
-	<classpathentry kind="src" path="socket-event-source/complex-socket-processing/src/main/java"/>
-	<classpathentry kind="src" path="socket-event-source/complex-socket-processing/src/test/java"/>
-	<classpathentry kind="src" path="socket-event-source/groovy-socket-decoder/src/test/java"/>
-	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/main/java"/>
-	<classpathentry kind="src" path="socket-event-source/simple-socket-decoder/src/test/java"/>
-	<classpathentry kind="src" path="spark-simple/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.2.10.RELEASE/spring-web-3.2.10.RELEASE.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/activemq/activemq-all/5.10.0/activemq-all-5.10.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.1.1/jackson-databind-2.1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.1.1/jackson-core-2.1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/3.2.10.RELEASE/spring-context-3.2.10.RELEASE.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/3.2.10.RELEASE/spring-beans-3.2.10.RELEASE.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/spark/spark-core_2.10/1.5.2/spark-core_2.10-1.5.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/spark/spark-streaming_2.10/1.5.2/spark-streaming_2.10-1.5.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-core-api/1.4.0/sitewhere-core-api-1.4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-core/1.4.0/sitewhere-core-1.4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-client/1.4.0/sitewhere-client-1.4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sitewhere/sitewhere-spark/1.4.0/sitewhere-spark-1.4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

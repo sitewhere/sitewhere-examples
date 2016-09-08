@@ -303,7 +303,7 @@ body {
 		popupToken = token;
 		jQuery.ajax({
 			'type' : 'GET',
-			'url' : "/sitewhere/api/assignments/" + token,
+			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token,
 			'headers' : {
 				"Authorization" : "Basic " + btoa("admin:password"),
 				"X-SiteWhere-Tenant" : "sitewhere1234567890"
@@ -314,7 +314,7 @@ body {
 		});
 		jQuery.ajax({
 			'type' : 'GET',
-			'url' : "/sitewhere/api/assignments/" + token + "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
+			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token + "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
 			'headers' : {
 				"Authorization" : "Basic " + btoa("admin:password"),
 				"X-SiteWhere-Tenant" : "sitewhere1234567890"
