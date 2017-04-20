@@ -138,6 +138,18 @@ body {
 <body>
 	<div id="map" style="width: 100%; height: 100%; position: absolute;"></div>
 	<img src="images/AirTrafficBanner.png" class="banner" />
+	<div id="authentication"
+		style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 25px; background-color: #666">
+		<span style="position: absolute; top: 2px; left: 20px;">Login:</span>
+		<input type="text" id="auth-login" value="admin"
+			style="position: absolute; top: 2px; left: 100px;" /> <span
+			style="position: absolute; top: 2px; left: 220px;">Password:</span> <input
+			type="password" id="auth-password" value="password"
+			style="position: absolute; top: 2px; left: 300px;" /> <span
+			style="position: absolute; top: 2px; left: 320px;">Tenant
+			Token:</span> <input type="text" id="auth-token" value="air123"
+			style="position: absolute; top: 2px; left: 400px;" />
+	</div>
 	<div id="detail-popup" class="detail-popup">
 		<div id="plane-info" class="plane-info"></div>
 		<div id="tabs" class="tabs">
@@ -320,8 +332,8 @@ body {
 			'type' : 'GET',
 			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token,
 			'headers' : {
-				"Authorization" : "Basic " + btoa("admin:password"),
-				"X-SiteWhere-Tenant" : "sitewhere1234567890"
+				"Authorization" : "Basic " + btoa($('#auth-login').val() + ":" + $('#auth-password').val()),
+				"X-SiteWhere-Tenant" : $('#auth-token').val()
 			},
 			'contentType' : 'application/json',
 			'success' : onAssignmentSuccess,
@@ -332,8 +344,8 @@ body {
 			'url' : "http://localhost:8080/sitewhere/api/assignments/" + token
 					+ "/measurements/series?page=1&pageSize=100&measurementIds=air.speed%2Cfuel.level",
 			'headers' : {
-				"Authorization" : "Basic " + btoa("admin:password"),
-				"X-SiteWhere-Tenant" : "sitewhere1234567890"
+				"Authorization" : "Basic " + btoa($('#auth-login').val() + ":" + $('#auth-password').val()),
+				"X-SiteWhere-Tenant" : $('#auth-token').val()
 			},
 			'contentType' : 'application/json',
 			'success' : onGraphDataSuccess,
