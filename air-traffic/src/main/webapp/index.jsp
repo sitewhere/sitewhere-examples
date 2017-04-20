@@ -50,6 +50,7 @@ body {
 	background-color: #fff;
 	border: 3px solid #000;
 	display: none;
+	font-family: arial;
 }
 
 .plane-info {
@@ -139,16 +140,16 @@ body {
 	<div id="map" style="width: 100%; height: 100%; position: absolute;"></div>
 	<img src="images/AirTrafficBanner.png" class="banner" />
 	<div id="authentication"
-		style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 25px; background-color: #666">
-		<span style="position: absolute; top: 2px; left: 20px;">Login:</span>
+		style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 25px; background-color: #666; font-family: arial; font-weight: bold; font-size: 16px;">
+		<span style="position: absolute; top: 7px; left: 20px;">Login:</span>
 		<input type="text" id="auth-login" value="admin"
 			style="position: absolute; top: 2px; left: 100px;" /> <span
-			style="position: absolute; top: 2px; left: 220px;">Password:</span> <input
+			style="position: absolute; top: 7px; left: 340px;">Password:</span> <input
 			type="password" id="auth-password" value="password"
-			style="position: absolute; top: 2px; left: 300px;" /> <span
-			style="position: absolute; top: 2px; left: 320px;">Tenant
+			style="position: absolute; top: 2px; left: 440px;" /> <span
+			style="position: absolute; top: 7px; left: 680px;">Tenant
 			Token:</span> <input type="text" id="auth-token" value="air123"
-			style="position: absolute; top: 2px; left: 400px;" />
+			style="position: absolute; top: 2px; left: 810px;" />
 	</div>
 	<div id="detail-popup" class="detail-popup">
 		<div id="plane-info" class="plane-info"></div>
