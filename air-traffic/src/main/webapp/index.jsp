@@ -140,7 +140,7 @@ body {
 	<div id="map" style="width: 100%; height: 100%; position: absolute;"></div>
 	<img src="images/AirTrafficBanner.png" class="banner" />
 	<div id="authentication"
-		style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 25px; background-color: #666; font-family: arial; font-weight: bold; font-size: 16px;">
+		style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 33px; background-color: #666; font-family: arial; font-weight: bold; font-size: 16px;">
 		<span style="position: absolute; top: 7px; left: 20px;">Login:</span>
 		<input type="text" id="auth-login" value="admin"
 			style="position: absolute; top: 2px; left: 100px;" /> <span
